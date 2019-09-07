@@ -11,7 +11,7 @@ DHT dht(dht_dpin, DHTTYPE);
 
 const char* ssid = "****";
 const char* password = "****";
-String remote_ip = "****";
+String remote_ip = "192.168.1.150";
 const long utcOffsetInSeconds = 0;
 String INSERT_REQ;
 String MAC;

@@ -9,8 +9,8 @@ os.system(cmd)
 cmd = r'git config --global user.email "jerrylarryliu@gmail.com"'
 os.system(cmd)
 
-# print('Enter commit message:')
-x = "update"
+x = input('Enter commit message:')
+# x = "update"
 
 cmd = 'git commit -am "' + x + '"'
 os.system(cmd)
