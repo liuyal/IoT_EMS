@@ -37,6 +37,7 @@
         {
             $data = array();
             $data["ID"] = $row["ID"];
+            $data["MAC"] = $row["MAC"];
             $data["TIME"] = $row["TIME"];
             $data["TEMP"] = $row["TEMP"];
             $data["HUM"] = $row["HUM"];

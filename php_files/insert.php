@@ -8,8 +8,9 @@
 
     $response = array();
 
-    if (isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) {
-     
+    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) {
+        
+        $mac = $_GET['mac'];
         $time = $_GET['time'];
         $temp = $_GET['temp'];
         $hum = $_GET['hum'];
@@ -25,7 +26,7 @@
             $response["message"][0] = "Server Connection failed: " . $e->getMessage();
         }
      
-        $result = mysqli_query($connect, "INSERT INTO DATA(TIME,TEMP,HUM) VALUES('$time','$temp','$hum')");
+        $result = mysqli_query($connect, "INSERT INTO DATA(MAC,TIME,TEMP,HUM) VALUES('$mac','$time','$temp','$hum');");
 
         if ($result) 
         {
