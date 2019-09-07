@@ -1,0 +1,5 @@
+sudo ntpdate 1.ro.pool.ntp.org
+
+date +%Y%m%d -s "20190824"
+
+date +%T -s "23:59:50"
