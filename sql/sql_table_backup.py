@@ -19,7 +19,7 @@ try:
     tables = cursor.fetchall()
 
     if len(tables) < 1:
-        cursor.execute("CREATE TABLE DATA(ID INT NOT NULL AUTO_INCREMENT, TIME BIGINT, TEMP DECIMAL(18,2), HUM DECIMAL(18,2), PRIMARY KEY (ID));")
+        cursor.execute("CREATE TABLE DATA( ID INT NOT NULL AUTO_INCREMENT, MAC CHAR(20), TIME BIGINT, TEMP DECIMAL (18, 2), HUM DECIMAL (18, 2), PRIMARY KEY (ID) );")
         sys.exit("Created DATA Table")
 
     cursor.execute("SELECT time from DATA;")
