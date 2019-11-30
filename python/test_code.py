@@ -19,7 +19,6 @@ for item in data:
 
 print(0)
 
-
 # a = requests.get('http://192.168.1.150/')
 # b = requests.get('http://192.168.1.150/read_all.php')
 # c = requests.get('http://192.168.1.150/insert.php?time=25&temp=22.52')
