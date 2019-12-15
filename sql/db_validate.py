@@ -5,8 +5,8 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
-show_tables = "http://192.168.1.150/show_tables.php"
-read_table = "http://192.168.1.150/read_table.php?table="
+show_tables = "http://192.168.1.150/php/show_tables.php"
+read_table = "http://192.168.1.150/php/select_from_table.php?table="
 main_table = []
 tables = []
 wrong_data = {}
@@ -80,7 +80,7 @@ try:del key, cmd, cmd2, i
 except: None
 
 try:
-    connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1')
+    connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
     # connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1')
     cursor = connection.cursor()
     cursor.execute("USE nova")
