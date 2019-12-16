@@ -12,7 +12,7 @@ date_stamp = (datetime.utcnow().date() - timedelta(1)).strftime('%Y%m%d')
 try:
     # connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
     # connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1')
-    connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1')
+    connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
     cursor = connection.cursor()
     cursor.execute("USE nova")
 
@@ -39,5 +39,5 @@ try:
 except mysql.connector.Error as error:
     print("Failed {}".format(error))
 
-os.system("sudo apt-get clean")
+# os.system("sudo apt-get clean")
 
