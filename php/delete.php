@@ -7,11 +7,21 @@
     require_once($filepath."/dbconfig.php");
 
     $response = array();
-     
-    if (isset($_GET['id'])) 
-    {
-        $id = $_GET['id'];
 
+
+    if (isset($_GET['mac']) && isset($_GET['time'])) 
+    {
+        $mac = $_GET['mac'];
+        $time = $_GET['time'];    
+
+        if (isset($_GET['table'])) 
+        { 
+            $table = $_GET['table']; 
+        }
+        else 
+        {
+            $table = "data"; 
+        }
         try 
         {
             $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD) or die(mysqli_error());
@@ -23,7 +33,7 @@
             $response["message"][0] = "Server Connection failed: " . $e->getMessage();
         }
 
-        $result = mysqli_query($connect, "DELETE FROM data WHERE id = $id");
+        $result = mysqli_query($connect, "DELETE FROM $table WHERE mac=$mac and time=$time");
      
         if (mysqli_affected_rows($connect) > 0) 
         {
@@ -33,7 +43,7 @@
         else 
         {
             $response["success"] = 0;
-            $response["message"][1] = "No data found by given id";
+            $response["message"][1] = "No data found in by given mac & time";
         }
     } 
     else 

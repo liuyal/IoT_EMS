@@ -1,6 +1,4 @@
-import os, sys, time
-import requests, datetime
-
+import os, sys, time, requests, datetime
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode

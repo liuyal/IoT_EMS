@@ -26,7 +26,7 @@ try:
         cursor.execute("CREATE TABLE data(mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (mac, time));")
         logging.error("data Table does not exist, creating data Table, EXIT.")
         sys.exit("data Table does not exist, creating data Table, EXIT.")
-:
+
     cursor.execute("SELECT mac, time, temp, hum from data;")
     time_list = cursor.fetchall()
 

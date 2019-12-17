@@ -8,8 +8,8 @@
 
     $response = array();
 
-    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) {
-        
+    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) 
+    {
         $mac = $_GET['mac'];
         $time = $_GET['time'];
         $temp = $_GET['temp'];
