@@ -1,39 +1,100 @@
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 
 <head>
     <title>Dashboard</title>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-    <script src="js/main.js"></script>
-    
-    <script src="https://kit.fontawesome.com/01f65a8d74.js" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+
+    <script src="https://kit.fontawesome.com/7f2e18d7c9.js" crossorigin="anonymous"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/sidebar.js"></script>
+    <link rel="stylesheet" href="css/body.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/sidebar.css">
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-
+<!-- https://coreui.io/demo/2.0/dark/#forms/basic-forms.html -->
+<!-- https://adminlte.io/themes/v3/index.html -->
 
 <body>
-  
-  
-  
 
-    
-    
-    
-    
-    
-  
-  
-  
-  
-  
+
+    <div class="main-header">
+        <nav class="navbar sticky-top navbar-dark bg-dark">
+
+            <a class="navbar-brand" href="#">DB</a>
+
+            <button id="menu-toggle" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <ul class="nav nav-pills mr-auto">
+                <li class="nav-item"><a class="nav-link text-white" href="#">Home</a></li>
+            </ul>
+
+        </nav>
+    </div>
+
+
+    <div class="wrapper ">
+        <div class="side_container">
+            <nav id="sidebar" class="bg-dark">
+                <ul class="list-unstyled components">
+                    <li class="active"><a href="#">Dashboard<i class="fas fa-tachometer-alt fa-fw"></i> </a></li>
+                    <li><a href="#">Monitor<i class="fas fa-desktop fa-fw"></i></a></li>
+                    <li><a href="#">Charts<i class="fas fa-chart-bar fa-fw"></i></a></li>
+                    <li><a href="#">Setting<i class="fas fa-cog fa-fw"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+    <!--
+    <div class="container-fluid">
+        <p id="data">Text</p>
+        <button type="button" onclick="load_table()">Test</button>
+    </div>
+-->
+
 </body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400');
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+
+/* Body Styles */
+
+body, html {
+    height: 100%;
+    position: relative;
+    background-color: rgb(37,41,46);
+}
+
+
+
+
