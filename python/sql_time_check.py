@@ -8,7 +8,7 @@ table_resp = response.json()["data"]
 tables = []
 
 for item in table_resp: tables.append(item['table'])
-tables.pop(-1)
+# tables.pop(-1)
 
 for date in tables:
     try:

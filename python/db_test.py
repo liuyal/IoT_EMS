@@ -6,7 +6,6 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
-
 req = "http://192.168.1.150/php/select_from_table.php?table=data"
 response = requests.get(req)
 data = response.json()["data"]

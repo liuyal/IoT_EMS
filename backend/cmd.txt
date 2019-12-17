@@ -4,9 +4,11 @@
 TIMESTAMP = date +%Y%m%d
 YESTERDAY_STAMP = date --date="1 day ago" +%Y%m%d
 
+timedatectl set-ntp false
 sudo ntpdate 1.ro.pool.ntp.org
-date +%Y%m%d -s "20190824"
+date +%Y%m%d -s "20191217"
 date +%T -s "23:59:50"
+
 
 --CRON--
 2 0 * * * python3 /etc/cron.daily/sql_backup/sql_table_backup.py

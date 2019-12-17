@@ -22,7 +22,7 @@
 
         $db = mysqli_select_db($connect, DB_DATABASE) or die(mysqli_error());
         
-        $result = mysqli_query($connect,"create table data(id INT NOT NULL AUTO_INCREMENT, mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id) );") or die(mysqli_error());
+        $result = mysqli_query($connect,"create table data(mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (mac, time) );") or die(mysqli_error());
     }
     catch(PDOException $e) 
     {

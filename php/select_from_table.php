@@ -36,7 +36,6 @@
         while ($row = mysqli_fetch_array($result)) 
         {
             $data = array();
-            $data["id"] = $row["id"];
             $data["mac"] = $row["mac"];
             $data["time"] = $row["time"];
             $data["temp"] = $row["temp"];
