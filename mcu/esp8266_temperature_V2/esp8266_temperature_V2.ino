@@ -32,7 +32,7 @@ void setup() {
   hostIP = IP;
 
   WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
+  Serial.print("\nConnecting to WiFi");
   unsigned long start_wait = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start_wait <= wifi_timeout) {
     Serial.print(".");
