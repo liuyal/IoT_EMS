@@ -15,29 +15,25 @@
 --TIME--
 TIMESTAMP = date +%Y%m%d
 YESTERDAY_STAMP = date --date="1 day ago" +%Y%m%d
-
 timedatectl set-ntp false
 sudo ntpdate 1.ro.pool.ntp.org
 date +%Y%m%d -s "20191217"
 date +%T -s "23:59:50"
 
-
 --CRON--
-2 0 * * * python3 /etc/cron.daily/sql_backup/sql_table_backup.py
-30 * * * * python3 /etc/cron.daily/sql_backup/sql_table_backup.py
+* * * * * sudo python3 /var/www/html/python/udp_cmd.py get_data
+1 0 * * * sudo python3 /var/www/html/python/data_backup.py
+@midnight sudo python3 /var/www/html/python/data_backup.py
 
 --BASH--
 mysqldump --databases nova > dump.sql
 netstat -tlpn | grep mysql
-
 sudo -H pip3 --default-timeout=1000 install --upgrade pip
 
 --SQL--
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';
 ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
-
-
 CREATE USER 'zeus'@'192.168.1.80' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO 'zeus'@'192.168.1.80';
 ALTER USER 'zeus'@'192.168.1.80' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
