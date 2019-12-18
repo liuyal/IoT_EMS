@@ -4,7 +4,7 @@ $(document).ready(function () {
     });
 
     $('#menu-toggle').on('click', function () {
-        $('#sidebar, #content').toggleClass('active');
+        $('#sidebar, #content','.side_container').toggleClass('active');
         $('.collapse.in').toggleClass('in');
         $('a[aria-expanded=true]').attr('aria-expanded', 'false');
     });
