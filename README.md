@@ -2,6 +2,9 @@
 
 ## Server
 
+### Django
+ - [Multi-Table Single Model](https://stackoverflow.com/questions/5036357/single-django-model-multiple-tables)
+
 ## Nodes
 
 
