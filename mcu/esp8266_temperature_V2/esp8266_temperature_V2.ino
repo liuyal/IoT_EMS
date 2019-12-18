@@ -52,15 +52,17 @@ void setup() {
   udp_send("[" + MAC + "|on]");
 }
 
-void get_data() {
+String get_data() {
   timeClient.update();
   float temp = dht.readTemperature();
   float hum = dht.readHumidity();
   int time_stamp = timeClient.getEpochTime();
-
+  String return_data = "";
+  
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String http_insert = "http://" + hostIP.toString() + "/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
+    return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
     Serial.println(http_insert);
     http.begin(http_insert);
     int httpCode = http.GET();
@@ -70,6 +72,7 @@ void get_data() {
     }
     http.end();
   }
+  return return_data;
 }
 
 IPAddress str_to_ip(String msg) {
@@ -77,9 +80,7 @@ IPAddress str_to_ip(String msg) {
   int Part = 0;
   for ( int i = 0; i < msg.length(); i++ ) {
     char c = msg[i];
-    if ( c == '.' ) {
-      Part++; continue;
-    }
+    if ( c == '.' ) Part++; continue;
     Parts[Part] *= 10;
     Parts[Part] += c - '0';
   }
@@ -106,14 +107,14 @@ void loop() {
     Serial.printf("Received %d bytes from %s:%d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
     Serial.printf("UDP Packet Contents: %s", incomingPacket);
     if (String(incomingPacket).indexOf("get_data") >= 0) {
-      get_data();
-      udp_send("[" + MAC + "|data_sent]");
+      String data_set = get_data();
+      udp_send("[" + MAC + "|" + data_set + "]");
     }
     else if (String(incomingPacket).indexOf("ping") >= 0) {
       udp_send("[" + MAC + "|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
     }
     else if (String(incomingPacket).indexOf("reboot") >= 0) {
-      udp_send("[" + MAC + "|reboot_ack]");
+      udp_send("[" + MAC + "|rebooting]");
       delay(1000);
       ESP.restart();
     }
