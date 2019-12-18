@@ -3,8 +3,11 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
-show_tables = "http://192.168.1.150/php/show_tables.php"
-read_table = "http://192.168.1.150/php/select_from_table.php?table="
+# ip = "192.168.1.150"
+ip = "localhost"
+
+show_tables = "http://" + ip +"/php/show_tables.php"
+read_table = "http://" + ip + "/php/select_from_table.php?table="
 main_table = []
 tables = []
 wrong_data = {}
@@ -54,7 +57,7 @@ add_cmd = []
 
 for key in wrong_data:
     for i in range (0, len(wrong_data[key])):
-        cmd = "DELETE FROM " + key + " WHERE time=" + str(wrong_data[key][i]["time"]) + " AND mac=" + str(wrong_data[key][i]["mac"]) + ";"
+        cmd = "DELETE FROM " + key + " WHERE time=" + str(wrong_data[key][i]["time"]) + " AND mac='" + str(wrong_data[key][i]["mac"]) + "';"
         remove_cmd.append(cmd)
 
 for key in new_data:
@@ -69,8 +72,8 @@ for key in new_data:
         add_cmd.append(cmd)
 
 try:
-    # connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
-    connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
+    connection = mysql.connector.connect(host=ip, database='nova', user='root', password='')
+    # connection = mysql.connector.connect(host=ip, database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
     cursor = connection.cursor()
     cursor.execute("USE nova")
     for item in remove_cmd: cursor.execute(item)
