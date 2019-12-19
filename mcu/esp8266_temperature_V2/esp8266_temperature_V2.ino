@@ -1,4 +1,4 @@
-#include <ESP8266WiFi.h>
+1#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecure.h>
 #include <NTPClient.h>
@@ -58,10 +58,10 @@ String get_data() {
   float hum = dht.readHumidity();
   int time_stamp = timeClient.getEpochTime();
   String return_data = "";
-  
+
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String http_insert = "http://" + hostIP.toString() + "/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
+    String http_insert = "http://" + hostIP.toString() + "/php/django_php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
     return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
     Serial.println(http_insert);
     http.begin(http_insert);
@@ -80,7 +80,10 @@ IPAddress str_to_ip(String msg) {
   int Part = 0;
   for ( int i = 0; i < msg.length(); i++ ) {
     char c = msg[i];
-    if ( c == '.' ) Part++; continue;
+    if ( c == '.' ) {
+      Part++;
+      continue;
+    }
     Parts[Part] *= 10;
     Parts[Part] += c - '0';
   }

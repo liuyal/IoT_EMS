@@ -12,7 +12,7 @@ class Current_status(models.Model):
 
 
 class Node(models.Model):
-    mac = models.CharField(unique=True, max_length=17)
+    mac = models.CharField(primary_key=True, max_length=17)
     ip = models.GenericIPAddressField(protocol='both',default='0.0.0.0')
     status = models.BooleanField(default=False)
 
@@ -21,6 +21,7 @@ class Node(models.Model):
 
 
 class Data(models.Model):
+    id = models.AutoField(primary_key=True)
     mac = models.CharField(max_length=17)
     time = models.IntegerField(default=0)
     temp = models.DecimalField(max_digits=10, decimal_places=2)
