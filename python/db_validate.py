@@ -64,7 +64,7 @@ for key in new_data:
     for i in range (0, len(new_data[key])):
 
         if key not in main_table:
-            cmd2 = "CREATE TABLE " + key + "(mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (mac, time));"
+            cmd2 = "CREATE TABLE " + key + "(id INT NOT NULL AUTO_INCREMENT, mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));"
             add_cmd.append(cmd2)
             main_table.append(key)
 

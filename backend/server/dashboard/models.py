@@ -28,4 +28,4 @@ class Data(models.Model):
     hum = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return (self.mac, self.time)
+        return self.mac
