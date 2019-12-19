@@ -8,13 +8,11 @@ logging.basicConfig(filename="./backup_logs.log", filemode='a', format='%(asctim
 logging.info("Back Up Started...")
 
 date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
-# date_stamp = (datetime.utcnow().date() + timedelta(1)).strftime('%Y%m%d')
-# yesterdate_stamp = (datetime.utcnow().date() - timedelta(1)).strftime('%Y%m%d')
 
 try:
     logging.info("Connecting to database nova.")
-    # connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
-    connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1')
+    connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
+    # connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1')
     # connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
 
     cursor = connection.cursor()

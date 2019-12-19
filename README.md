@@ -2,17 +2,22 @@
 
 ## Server
 
-### Django
- - [Multi-Table Single Model](https://stackoverflow.com/questions/5036357/single-django-model-multiple-tables)
-
 ## Nodes
 
 
-### MISC
+## Django Guides
+ - [Django Document](https://docs.djangoproject.com/en/3.0/)
+ - [Django Guide](https://simpleisbetterthancomplex.com/series/beginners-guide/1.11/)
+ - [Multi-Table Single Model](https://stackoverflow.com/questions/5036357/single-django-model-multiple-tables)
+ - [Celery Periodic Tasks](https://docs.celeryproject.org/en/latest/userguide/periodic-tasks.html)
+ - [Background Tasks](https://django-background-tasks.readthedocs.io/en/latest/)
+ - [Django Socket](https://pypi.org/project/django-socket-server/)
+ - [Twisted](https://twistedmatrix.com/trac/)
 
-- [AP link](https://www.diyhobi.com/install-wifi-hotspot-raspberry-pi-ubuntu-mate/)
-- [Django Document](https://docs.djangoproject.com/en/3.0/)
-- [Django Guide](https://simpleisbetterthancomplex.com/series/beginners-guide/1.11/)
+
+## MISC
+
+- [AP Config](https://www.diyhobi.com/install-wifi-hotspot-raspberry-pi-ubuntu-mate/)
 
 ```
 --TIME--
