@@ -7,7 +7,7 @@
     require_once($filepath."/dbconfig.php");
 
     $response = array();
-    
+
     if (isset($_GET['table'])){$table = $_GET['table'];}
     else{$table = "data";}
 
@@ -19,16 +19,15 @@
     catch(PDOException $e){
         $response["message"][0] = "Server Connection failed: " . $e->getMessage();
     }
-     
+
     $result = mysqli_query($connect, "SELECT * FROM $table");
-    
+
     if (!$result){
         $response["success"] = 0;
         $response["message"][1] = "No matching table found";
     }
-    else if (mysqli_num_rows($result) > 0) {
+    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'data')) {
         $response["data"] = array();
-        
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
             $data["mac"] = $row["mac"];
@@ -39,9 +38,34 @@
         }
         $response["success"] = 1;
         $response["message"][1] = "Data found successfully";
-    }	
+    } 
+    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'nodes')) {
+        $response["data"] = array();
+        while ($row = mysqli_fetch_array($result)) {
+            $data = array();
+            $data["mac"] = $row["mac"];
+            $data["ip"] = $row["ip"];
+            $data["port"] = $row["port"];
+            $data["time_stamp"] = $row["time_stamp"];
+            $data["status"] = $row["status"];
+            array_push($response["data"], $data);
+        }
+        $response["success"] = 1;
+        $response["message"][1] = "Node Data found successfully";
+    }
+    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'system_config')) {
+        $response["data"] = array();
+        while ($row = mysqli_fetch_array($result)) {
+            $data = array();
+            $data["host_ip"] = $row["host_ip"];
+            $data["host_port"] = $row["host_port"];
+            array_push($response["data"], $data);
+        }
+        $response["success"] = 1;
+        $response["message"][1] = "System Config Data found successfully";
+    } 
     else {
-    	$response["success"] = 0;
+        $response["success"] = 0;
         $response["message"][1] = "No data found";
     }
     echo json_encode($response);

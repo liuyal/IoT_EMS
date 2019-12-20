@@ -4,13 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.http import Http404
 
-from .models import Current_status, Data
+from .models import Data
 
 
 
 def home(request):
-    current_status = Current_status.objects.all()
 
     data = Data.objects.all()
 
-    return render(request, 'index.html', {'current_status': current_status})
+    return render(request, 'index.html', {'data': data})

@@ -22,7 +22,7 @@
         $db = mysqli_select_db($connect, DB_DATABASE) or die(mysqli_error());
         
         $result1 = mysqli_query($connect,"CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));") or die(mysqli_error());
-        $result2 = mysqli_query($connect,"CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, status boolean, PRIMARY KEY (mac));") or die(mysqli_error());
+        $result2 = mysqli_query($connect,"CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp INT, status boolean, PRIMARY KEY (mac));") or die(mysqli_error());
         $result3 = mysqli_query($connect,"CREATE Table system_config(host_ip CHAR(39), host_port CHAR(39));") or die(mysqli_error());
 
     }

@@ -23,16 +23,19 @@
             $response["message"][0] = "Server Connection failed: " . $e->getMessage();
         }
      
-        $result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
+        $result1 = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
+        $result2 = mysqli_query($connect, "SHOW Tables;");
+        // TODO: update nodes status, time_stamp
 
-        if ($result) {
-            $response["success"] = 1;
-            $response["message"][1] = "Data successfully inserted";
-        } 
-        else {
-            $response["success"] = 0;
-            $response["message"][1] = "Data failed to insert";
-        }
+        if ($result1) {$response["message"][1] = "Data successfully inserted";} 
+        else {$response["message"][1] = "Data failed to insert";}
+
+        if($result2) {$response["message"][2] = "node:'$mac' status updated";}
+        else {$response["message"][2] = "node:'$mac' failed to update status";}
+
+        if ($result1 && $result2){$response["success"] = 1;}
+        else {$response["success"] = 0;}
+
     } 
     else {
         $response["success"] = 0;

@@ -10,8 +10,8 @@
 #define dht_dpin 5
 DHT dht(dht_dpin, DHTTYPE);
 
-const char* ssid = "TELUS3854";
-const char* password = "tsp5df7yfy";
+const char* ssid = "";
+const char* password = "";
 IPAddress hostIP(1, 1, 1, 1);
 int ip_addr = 0;
 int port_addr = 4;
@@ -136,8 +136,8 @@ void loop() {
   if (packetSize) {
     int len = Udp.read(incomingPacket, 255);
     if (len > 0) incomingPacket[len] = 0;
-    Serial_Print("Received " + String(packetSize) + " bytes from " + Udp.remoteIP().toString().c_str() + ":" + String(Udp.remotePort()) + "\n");
-    Serial_Print("UDP Packet Contents: " + String(incomingPacket) + "\n");
+    Serial_Print("\nReceived " + String(packetSize) + " bytes from " + Udp.remoteIP().toString().c_str() + ":" + String(Udp.remotePort()) + "\n");
+    Serial_Print("UDP Packet Contents: " + String(incomingPacket));
     cmd(String(incomingPacket));
   }
 }

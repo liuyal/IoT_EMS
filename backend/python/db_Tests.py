@@ -42,8 +42,7 @@ def time_check(ip):
                 epoch_time = item["time"]
                 times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
                 print("\t" + str(times))
-        except:
-            None
+        except: None
 
 
 def data_generator(ip, n=10):
