@@ -101,6 +101,30 @@ void udp_send(String msg) {
   }
 }
 
+void commands(String s) {
+  if (String(incomingPacket).indexOf("get_data") >= 0) {
+    String data_set = get_data();
+    udp_send("[" + MAC + "|" + data_set + "]");
+  }
+  else if (String(incomingPacket).indexOf("ping") >= 0) {
+    udp_send("[" + MAC + "|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
+  }
+  else if (String(incomingPacket).indexOf("reboot") >= 0) {
+    udp_send("[" + MAC + "|rebooting]");
+    delay(1000);
+    ESP.restart();
+  }
+  else if (String(incomingPacket).indexOf("set_ip") >= 0) {
+    int start_index = String(incomingPacket).indexOf("|") + 1;
+    int end_index = String(incomingPacket).indexOf("]");
+    String msg = String(incomingPacket).substring(start_index, end_index);
+    IPAddress IP = str_to_ip(msg);
+    hostIP = IP;
+    Serial.println("Host IP Set: " + hostIP.toString());
+    udp_send("[" + MAC + "|set_ip_ack]");
+  }
+}
+
 void loop() {
   int packetSize = Udp.parsePacket();
   if (packetSize) {
@@ -108,26 +132,6 @@ void loop() {
     if (len > 0) incomingPacket[len] = 0;
     Serial.printf("Received %d bytes from %s:%d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
     Serial.printf("UDP Packet Contents: %s", incomingPacket);
-    if (String(incomingPacket).indexOf("get_data") >= 0) {
-      String data_set = get_data();
-      udp_send("[" + MAC + "|" + data_set + "]");
-    }
-    else if (String(incomingPacket).indexOf("ping") >= 0) {
-      udp_send("[" + MAC + "|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
-    }
-    else if (String(incomingPacket).indexOf("reboot") >= 0) {
-      udp_send("[" + MAC + "|rebooting]");
-      delay(1000);
-      ESP.restart();
-    }
-    else if (String(incomingPacket).indexOf("set_ip") >= 0) {
-      int start_index = String(incomingPacket).indexOf("|") + 1;
-      int end_index = String(incomingPacket).indexOf("]");
-      String msg = String(incomingPacket).substring(start_index, end_index);
-      IPAddress IP = str_to_ip(msg);
-      hostIP = IP;
-      Serial.println("Host IP Set: " + hostIP.toString());
-      udp_send("[" + MAC + "|set_ip_ack]");
-    }
+
   }
 }
