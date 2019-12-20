@@ -4,7 +4,6 @@
 
 <head>
     <title>Dashboard</title>
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -27,6 +26,7 @@
 
 <!-- https://coreui.io/demo/2.0/dark/#main.html -->
 <!-- https://adminlte.io/themes/v3/index.html -->
+<!-- https://bootstrapious.com/p/bootstrap-sidebar -->
 <!-- https://www.w3schools.com/bootstrap/tryit.asp?filename=trybs_temp_analytics&stacked=h -->
 
 <body>
@@ -36,22 +36,23 @@
         <header class="header">
             <div class="nav-header">
                 <div class="navbar sticky-top navbar-dark bg-dark">
-                    <a class="navbar-brand" href="#">TS</a>
+                    <a class="navbar-brand" href="">TS</a>
                     <button id="menu-toggle" class="navbar-toggler mr-auto">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                 </div>
             </div>
-
         </header>
+
+
 
         <aside class="sidenav bg-dark">
             <div class="side_container">
                 <nav id="sidebar" class="bg-dark">
                     <ul class="list-unstyled components">
                         <li class="sidebtn active"><a href="index.html">Dashboard<i class="fas fa-tachometer-alt fa-fw"></i> </a></li>
-                        <li class="sidebtn"><a href="#charts.html">Charts<i class="fas fa-chart-bar fa-fw"></i></a></li>
-                        <li class="sidebtn"><a href="#monitor.html">Nodes<i class="fas fa-desktop fa-fw"></i></a></li>
+                        <li class="sidebtn "><a href="#charts.html">Charts<i class="fas fa-chart-bar fa-fw"></i></a></li>
+                        <li class="sidebtn"><a href="#nodes.html">Nodes<i class="fas fa-map-marker-alt fa-fw"></i></a></li>
                         <li class="sidebtn"><a href="#settings.html">Setting<i class="fas fa-cog fa-fw"></i></a></li>
                     </ul>
                 </nav>
@@ -61,30 +62,48 @@
 
 
         <main class="main">
-            <div class="main-header">
-                <div class="main-header__heading">Hello User</div>
-                <div class="main-header__updates">Recent Items</div>
+            <div class="main-header bg-dark">
             </div>
 
+            <div class="main-overview">
+                <div class="overviewcard A">
+
+                    <div class="overviewcard__label">Nodes Online</div>
+                    <div class="overviewcard__info">1</div>
+                    <div class="overviewcard__icon"></div>
+
+                </div>
+                <div class="overviewcard B">
+
+                    <div class="overviewcard__label">Temperature</div>
+                    <div class="overviewcard__info">23.00&ordm;C</div>
+                    <div class="overviewcard__icon"></div>
+
+                </div>
+                <div class="overviewcard C">
+
+                    <div class="overviewcard__label">Humidity</div>
+                    <div class="overviewcard__info">49.00%</div>
+                    <div class="overviewcard__icon"></div>
+
+                </div>
+                <div class="overviewcard D">
+
+                    <div class="overviewcard__label">Time</div>
+                    <div class="overviewcard__info">01:00 PM</div>
+                    <div class="overviewcard__icon"></div>
+
+                </div>
+            </div>
+
+
         </main>
-
-
-
-
-
-
 
 
 
         <footer class="footer"></footer>
 
     </div>
-
-
-
-
-
-
 
 
 
@@ -97,4 +116,6 @@
 -->
 
 
-</body></html>
+</body>
+
+</html>

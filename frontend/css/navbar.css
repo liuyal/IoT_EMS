@@ -3,29 +3,42 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0;
+    transition-duration: 0.3s;
     z-index: 1;
 }
 
-
 .nav-header {
-    border-bottom-color: rgb(37, 41, 46);
-    border-bottom-width: 5px;
-    outline-width: 2px;
     position: fixed;
     width: 100%;
 }
 
 .navbar-brand {
-    width: 100px;
+    width: 125px;
     text-align: center;
     padding: 0;
+    transition-duration: 0.3s;
+}
+
+.navbar-brand.active {
+    width: calc(140px - 96px);
+    margin-left: -15px;
 }
 
 .navbar-toggler {
+    padding-left: 0;
     border: none;
     outline: none;
-    /*    margin-left: 130px;*/
+    transition-duration: 0.3s;
+}
+
+.navbar-toggler:focus {
+    border: none;
+    outline: none;
+}
+
+.navbar-toggler.active {
+    border: none;
+    outline: none;
 }
 
 .nav-link {
