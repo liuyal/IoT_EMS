@@ -8,33 +8,28 @@
 
     $response = array();
     
-    if (isset($_GET['table']))
-    {
-    	$table = $_GET['table'];
-    }
-    else
-    {
-    	$table = "data";
-    }
+    if (isset($_GET['table'])){$table = $_GET['table'];}
+    else{$table = "data";}
 
-    try 
-    { 
+    try { 
         $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
         $db = mysqli_select_db($connect, DB_DATABASE);
         $response["message"][0] = "Server Connected successfully";
     }
-    catch(PDOException $e)
-    {
+    catch(PDOException $e){
         $response["message"][0] = "Server Connection failed: " . $e->getMessage();
     }
      
     $result = mysqli_query($connect, "SELECT * FROM $table");
-     
-    if (mysqli_num_rows($result) > 0) 
-    {
+    
+    if (!$result){
+        $response["success"] = 0;
+        $response["message"][1] = "No matching table found";
+    }
+    else if (mysqli_num_rows($result) > 0) {
         $response["data"] = array();
-        while ($row = mysqli_fetch_array($result)) 
-        {
+        
+        while ($row = mysqli_fetch_array($result)) {
             $data = array();
             $data["mac"] = $row["mac"];
             $data["time"] = $row["time"];
@@ -45,8 +40,7 @@
         $response["success"] = 1;
         $response["message"][1] = "Data found successfully";
     }	
-    else 
-    {
+    else {
     	$response["success"] = 0;
         $response["message"][1] = "No data found";
     }

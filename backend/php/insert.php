@@ -8,41 +8,35 @@
 
     $response = array();
 
-    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) 
-    {
+    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) {
         $mac = $_GET['mac'];
         $time = $_GET['time'];
         $temp = $_GET['temp'];
         $hum = $_GET['hum'];
      
-        try 
-        {
+        try {
             $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
             $db = mysqli_select_db($connect, DB_DATABASE);
             $response["message"][0] = "Server Connected successfully";
         }
-        catch(PDOException $e)
-        {
+        catch(PDOException $e){
             $response["message"][0] = "Server Connection failed: " . $e->getMessage();
         }
      
         $result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
 
-        if ($result) 
-        {
+        if ($result) {
             $response["success"] = 1;
             $response["message"][1] = "Data successfully inserted";
         } 
-        else 
-        {
+        else {
             $response["success"] = 0;
             $response["message"][1] = "Data failed to insert";
         }
     } 
-    else 
-    {
+    else {
         $response["success"] = 0;
-        $response["message"][0] = "Parameter(s) are missing. Please check the request";
+        $response["message"][0] = "Parameter(s) are missing. Please check request";
     }
     echo json_encode($response);
     mysqli_close($connect);

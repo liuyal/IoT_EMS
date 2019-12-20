@@ -22,7 +22,7 @@ try:
     tables = cursor.fetchall()
 
     if len(tables) < 1:
-        cursor.execute("CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
+        cursor.execute("CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
         logging.error("data Table does not exist, creating data Table, EXIT.")
         sys.exit("data Table does not exist, creating data Table, EXIT.")
 
@@ -44,7 +44,7 @@ try:
             if cursor.fetchone()[0] == 1: table_exist = True
             if not table_exist:
                 logging.info(table_name + " Table does not exist, creating table.")
-                create_cmd = "CREATE TABLE " + table_name + "(id INT NOT NULL AUTO_INCREMENT, mac CHAR(20), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));"
+                create_cmd = "CREATE TABLE " + table_name + "(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));"
                 cursor.execute(create_cmd)
             insert_cmd = "INSERT INTO " + table_name + "(mac,time,temp,hum) VALUES('" + str(item[0]) + "'," + str(item[1]) + "," + str(item[2]) + "," + str(item[3]) + ");"
             remove_cmd = "DELETE FROM data WHERE mac='" + str(item[0]) + "' AND time=" + str(item[1]) + ";"

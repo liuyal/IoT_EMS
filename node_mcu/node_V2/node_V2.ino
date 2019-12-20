@@ -10,9 +10,11 @@
 #define dht_dpin 5
 DHT dht(dht_dpin, DHTTYPE);
 
-const char* ssid = "";
-const char* password = "";
-IPAddress hostIP(192, 168, 1, 150);
+const char* ssid = "TELUS3854";
+const char* password = "tsp5df7yfy";
+IPAddress hostIP(1, 1, 1, 1);
+int ip_addr = 0;
+int port_addr = 4;
 int UdpPort = 9996;
 int wifi_timeout = 10 * 1000;
 
@@ -28,28 +30,31 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 void setup() {
   Serial.begin(115200);
   EEPROM.begin(64);
-  IPAddress IP(EEPROM.read(0) , EEPROM.read(1) , EEPROM.read(2) , EEPROM.read(3));
+  IPAddress IP(EEPROM.read(ip_addr) , EEPROM.read(ip_addr + 1) , EEPROM.read(ip_addr + 2) , EEPROM.read(ip_addr + 3));
   hostIP = IP;
-
   WiFi.begin(ssid, password);
-  Serial.print("\nConnecting to WiFi");
+  Serial_Print("\nConnecting to WiFi");
   unsigned long start_wait = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start_wait <= wifi_timeout) {
-    Serial.print(".");
+    Serial_Print(".");
     delay(500);
   }
 
   MAC = WiFi.macAddress();
-  Serial.println("\nConnected to: " + String(ssid));
-  Serial.println("Gateway IP: " + WiFi.gatewayIP().toString());
-  Serial.println("Local IP: " + WiFi.localIP().toString());
-  Serial.printf("UDP port: %d\n", UdpPort);
-  Serial.println("Host IP: " + hostIP.toString());
+  Serial_Print("\nConnected to: " + String(ssid) + "\n");
+  Serial_Print("Gateway IP: " + WiFi.gatewayIP().toString() + "\n");
+  Serial_Print("Local IP: " + WiFi.localIP().toString() + "\n");
+  Serial_Print("UDP port: " + String(UdpPort) + "\n");
+  Serial_Print("Host IP: " + hostIP.toString() + "\n");
 
   dht.begin();
   timeClient.begin();
   Udp.begin(UdpPort);
-  udp_send("[" + MAC + "|on]");
+  udp_send("[" + MAC + "|node_on]");
+}
+
+void Serial_Print(String msg) {
+  Serial.print(msg);
 }
 
 String get_data() {
@@ -63,19 +68,19 @@ String get_data() {
     HTTPClient http;
     String http_insert = "http://" + hostIP.toString() + "/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
     return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
-    Serial.println(http_insert);
+    Serial_Print(http_insert + "\n");
     http.begin(http_insert);
     int httpCode = http.GET();
     if (httpCode > 0) {
       String payload = http.getString();
-      Serial.println(payload);
+      Serial_Print(payload + "\n");
     }
     http.end();
   }
   return return_data;
 }
 
-IPAddress str_to_ip(String msg) {
+IPAddress setIP(String msg) {
   int Parts[4] = {0, 0, 0, 0};
   int Part = 0;
   for ( int i = 0; i < msg.length(); i++ ) {
@@ -87,8 +92,8 @@ IPAddress str_to_ip(String msg) {
     Parts[Part] += c - '0';
   }
   IPAddress IP(Parts[0], Parts[1], Parts[2], Parts[3]);
-  EEPROM.write(0, Parts[0]); EEPROM.write(1, Parts[1]);
-  EEPROM.write(2, Parts[2]); EEPROM.write(3, Parts[3]);
+  EEPROM.write(ip_addr, Parts[0]); EEPROM.write(ip_addr + 1, Parts[1]);
+  EEPROM.write(ip_addr + 2, Parts[2]); EEPROM.write(ip_addr + 3, Parts[3]);
   EEPROM.commit();
   return IP;
 }
@@ -101,26 +106,27 @@ void udp_send(String msg) {
   }
 }
 
-void commands(String s) {
-  if (String(incomingPacket).indexOf("get_data") >= 0) {
+// TODO: set port
+void cmd(String udp_packet) {
+  if (String(udp_packet).indexOf("get_data") >= 0) {
     String data_set = get_data();
     udp_send("[" + MAC + "|" + data_set + "]");
   }
-  else if (String(incomingPacket).indexOf("ping") >= 0) {
+  else if (String(udp_packet).indexOf("ping") >= 0) {
     udp_send("[" + MAC + "|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
   }
-  else if (String(incomingPacket).indexOf("reboot") >= 0) {
+  else if (String(udp_packet).indexOf("reboot") >= 0) {
     udp_send("[" + MAC + "|rebooting]");
     delay(1000);
     ESP.restart();
   }
-  else if (String(incomingPacket).indexOf("set_ip") >= 0) {
-    int start_index = String(incomingPacket).indexOf("|") + 1;
-    int end_index = String(incomingPacket).indexOf("]");
-    String msg = String(incomingPacket).substring(start_index, end_index);
-    IPAddress IP = str_to_ip(msg);
+  else if (String(udp_packet).indexOf("set_ip") >= 0) {
+    int start_index = String(udp_packet).indexOf("|") + 1;
+    int end_index = String(udp_packet).indexOf("]");
+    String msg = String(udp_packet).substring(start_index, end_index);
+    IPAddress IP = setIP(msg);
     hostIP = IP;
-    Serial.println("Host IP Set: " + hostIP.toString());
+    Serial_Print("Host IP Set: " + hostIP.toString() + "\n");
     udp_send("[" + MAC + "|set_ip_ack]");
   }
 }
@@ -130,8 +136,8 @@ void loop() {
   if (packetSize) {
     int len = Udp.read(incomingPacket, 255);
     if (len > 0) incomingPacket[len] = 0;
-    Serial.printf("Received %d bytes from %s:%d\n", packetSize, Udp.remoteIP().toString().c_str(), Udp.remotePort());
-    Serial.printf("UDP Packet Contents: %s", incomingPacket);
-
+    Serial_Print("Received " + String(packetSize) + " bytes from " + Udp.remoteIP().toString().c_str() + ":" + String(Udp.remotePort()) + "\n");
+    Serial_Print("UDP Packet Contents: " + String(incomingPacket) + "\n");
+    cmd(String(incomingPacket));
   }
 }
