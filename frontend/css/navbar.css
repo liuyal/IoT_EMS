@@ -1,19 +1,31 @@
-.main-header{
-    border-bottom-color: rgb(37,41,46);
+.header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    z-index: 1;
+}
+
+
+.nav-header {
+    border-bottom-color: rgb(37, 41, 46);
     border-bottom-width: 5px;
     outline-width: 2px;
     position: fixed;
     width: 100%;
 }
+
 .navbar-brand {
-    width: 125px;
+    width: 100px;
     text-align: center;
+    padding: 0;
 }
 
 .navbar-toggler {
     border: none;
     outline: none;
-/*    margin-left: 130px;*/
+    /*    margin-left: 130px;*/
 }
 
 .nav-link {
@@ -24,4 +36,3 @@
     padding-left: 30px;
     padding-right: 20px;
 }
-

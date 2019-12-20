@@ -4,12 +4,25 @@
 
 /* Body Styles */
 
-body, html {
+body,
+html {
+    margin: 0;
+    padding: 0;
     height: 100%;
     position: relative;
-    background-color: rgb(37,41,46);
+    background-color: rgb(37, 41, 46);
+    box-sizing: border-box;
 }
 
 
-
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 50px 1fr 50px;
+    grid-template-areas:
+        'header'
+        'main'
+        'footer';
+    height: 100vh;
+}
 

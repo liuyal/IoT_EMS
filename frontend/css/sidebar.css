@@ -18,55 +18,37 @@ li a:focus {
     SIDEBAR STYLE
 ----------------------------------------------------- */
 
-.wrapper {
-    width: 100%;
+.sidenav {
+    grid-area: sidenav;
+    display: flex;
+    flex-direction: column;
     height: 100%;
-}
-
-.side_container{
-    border: solid 1px rgb(37, 41, 46);;
-    padding-top: 56px;
-    height: inherit;
-    width: 140px;
-}
-
-.side_container.active{
-    padding-right: calc(100% - 236px);
+    position: fixed;
+    overflow-y: auto;
+    padding-top: 52px;
+    background-color: rgb (52, 58, 64);
 }
 
 #sidebar {
     font-size: 12px;
     width: 140px;
     position: fixed;
-    left: 0;
-    height: 100%;
-    color: #fff;
+    height: inherit;
     transition: all 0.3s;
+    background-color: rgb (52, 58, 64);
     border-top-color: rgb(37, 41, 46);
     border-top-style: solid;
-    border-top-width: 1px;
-
+    border-top-width: 3px;
 }
 
 #sidebar.active {
     margin-left: -96px;
 }
 
-#sidebar .sidebar-header {
-    padding-left: 10px;
-    padding-top: 20px;
-    text-decoration-color: rgb(37, 41, 46);
-}
 
 #sidebar ul.components {
     padding: 10px 0;
-
-}
-
-#sidebar ul p {
     color: #fff;
-    padding: 10px;
-
 }
 
 #sidebar i.fas {
@@ -77,15 +59,9 @@ li a:focus {
 }
 
 #sidebar ul li a {
-
     padding: 10px;
     font-size: 1.1em;
     display: block;
-/*
-    margin-top: -1px;
-    border-top: 1px solid rgb(37, 41, 46);
-    border-bottom: 1px solid rgb(37, 41, 46);
-*/
 }
 
 #sidebar ul li a:hover {

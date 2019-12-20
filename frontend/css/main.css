@@ -1,0 +1,23 @@
+.main {
+    grid-area: main;
+    background-color: rgb(37, 41, 46);
+    margin-left: 140px;
+    transition-duration: 0.3s;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    padding: 20px;
+    height: 150px;
+    background-color: #e3e4e6;
+    color: slategray;
+}
+
+.main.active {
+    transition-duration: 0.3s;
+    margin-left: calc(140px - 96px);
+
+
+}
