@@ -33,7 +33,7 @@ li a:focus {
     font-size: 12px;
     width: 140px;
     position: fixed;
-    height: inherit;
+    height: 100%;
     transition: all 0.3s;
     background-color: rgb (52, 58, 64);
     border-top-color: rgb(37, 41, 46);
@@ -43,6 +43,7 @@ li a:focus {
 
 #sidebar.active {
     margin-left: -96px;
+    height: 100%;
 }
 
 
