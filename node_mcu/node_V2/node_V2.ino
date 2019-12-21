@@ -10,9 +10,10 @@
 #define dht_dpin 5
 DHT dht(dht_dpin, DHTTYPE);
 
+//DOTO: Serial set Wi-Fi & Save to EEPROM
 const char* ssid = "";
 const char* password = "";
-IPAddress hostIP(1, 1, 1, 1);
+IPAddress hostIP(0, 0, 0, 0);
 int ip_addr = 0;
 int port_addr = 4;
 int UdpPort = 9996;
@@ -33,7 +34,7 @@ void setup() {
   IPAddress IP(EEPROM.read(ip_addr) , EEPROM.read(ip_addr + 1) , EEPROM.read(ip_addr + 2) , EEPROM.read(ip_addr + 3));
   hostIP = IP;
   WiFi.begin(ssid, password);
-  Serial_Print("\nConnecting to WiFi");
+  Serial_Print("\r\nConnecting to WiFi");
   unsigned long start_wait = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - start_wait <= wifi_timeout) {
     Serial_Print(".");
@@ -41,11 +42,11 @@ void setup() {
   }
 
   MAC = WiFi.macAddress();
-  Serial_Print("\nConnected to: " + String(ssid) + "\n");
-  Serial_Print("Gateway IP: " + WiFi.gatewayIP().toString() + "\n");
-  Serial_Print("Local IP: " + WiFi.localIP().toString() + "\n");
-  Serial_Print("UDP port: " + String(UdpPort) + "\n");
-  Serial_Print("Host IP: " + hostIP.toString() + "\n");
+  Serial_Print("\r\nConnected to: " + String(ssid) + "\r\n");
+  Serial_Print("Gateway IP: " + WiFi.gatewayIP().toString() + "\r\n");
+  Serial_Print("Local IP: " + WiFi.localIP().toString() + "\r\n");
+  Serial_Print("UDP port: " + String(UdpPort) + "\r\n");
+  Serial_Print("Host IP: " + hostIP.toString() + "\r\n");
 
   dht.begin();
   timeClient.begin();
@@ -66,14 +67,14 @@ String get_data() {
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String http_insert = "http://" + hostIP.toString() + "/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
+    String http_insert = "http://" + hostIP.toString() + "/backend/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
     return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
-    Serial_Print(http_insert + "\n");
+    Serial_Print(http_insert + "\r\n");
     http.begin(http_insert);
     int httpCode = http.GET();
     if (httpCode > 0) {
       String payload = http.getString();
-      Serial_Print(payload + "\n");
+      Serial_Print(payload + "\r\n");
     }
     http.end();
   }
@@ -101,19 +102,19 @@ IPAddress setIP(String msg) {
 void udp_send(String msg) {
   if (WiFi.status() == WL_CONNECTED) {
     Udp.beginPacket(hostIP, UdpPort);
-    Udp.printf((msg + "\n").c_str());
+    Udp.printf((msg + "\r\n").c_str());
     Udp.endPacket();
   }
 }
 
 // TODO: set port
 void cmd(String udp_packet) {
-  if (String(udp_packet).indexOf("get_data") >= 0) {
+  if (String(udp_packet).indexOf("fetch_data") >= 0) {
     String data_set = get_data();
-    udp_send("[" + MAC + "|" + data_set + "]");
+    udp_send("[" + MAC + "|data_sent|" + data_set + "]");
   }
   else if (String(udp_packet).indexOf("ping") >= 0) {
-    udp_send("[" + MAC + "|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
+    udp_send("[" + MAC + "|pong|" + hostIP.toString() + "|" + WiFi.localIP().toString() + "]");
   }
   else if (String(udp_packet).indexOf("reboot") >= 0) {
     udp_send("[" + MAC + "|rebooting]");
@@ -126,8 +127,8 @@ void cmd(String udp_packet) {
     String msg = String(udp_packet).substring(start_index, end_index);
     IPAddress IP = setIP(msg);
     hostIP = IP;
-    Serial_Print("Host IP Set: " + hostIP.toString() + "\n");
-    udp_send("[" + MAC + "|set_ip_ack]");
+    Serial_Print("Host IP Set: " + hostIP.toString() + "\r\n");
+    udp_send("[" + MAC + "|ip_set]");
   }
 }
 
@@ -136,7 +137,7 @@ void loop() {
   if (packetSize) {
     int len = Udp.read(incomingPacket, 255);
     if (len > 0) incomingPacket[len] = 0;
-    Serial_Print("\nReceived " + String(packetSize) + " bytes from " + Udp.remoteIP().toString().c_str() + ":" + String(Udp.remotePort()) + "\n");
+    Serial_Print("\r\nReceived " + String(packetSize) + " bytes from " + Udp.remoteIP().toString().c_str() + ":" + String(Udp.remotePort()) + "\r\n");
     Serial_Print("UDP Packet Contents: " + String(incomingPacket));
     cmd(String(incomingPacket));
   }

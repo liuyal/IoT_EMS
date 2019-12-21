@@ -1,4 +1,4 @@
-import os, sys, time, datetime, requests, subprocess
+import os, sys, time, datetime, requests, subprocess, serial
 from datetime import date, timedelta
 from random import seed
 from random import randint
@@ -20,7 +20,7 @@ def sql_connector_test(ip):
         print("Failed access table {}".format(error))
 
 
-def request_test(ip, folder):
+def request_test(ip, folder="backend/php/"):
     req = "http://" + ip + "/" + folder + "show_tables.php"
     response = requests.get(req)
     data = response.json()["data"]
@@ -57,13 +57,26 @@ def data_generator(ip, n=10):
         print(response.json())
 
 
+def add_nodes(mac, ip):
+    try:
+        connection = mysql.connector.connect(host=ip, database='nova', user='root', password='', auth_plugin='mysql_native_password')
+        cursor = connection.cursor()
+        cursor.execute("USE nova")
+        for item in mac:
+            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 9996, 0, FALSE)")
+            connection.commit()
+
+    except mysql.connector.Error as error:
+        print("Failed access table {}".format(error))
+
+
 if __name__ == "__main__":
 
-    # ip = "localhost"
-    ip = "192.168.1.150"
+    ip = "localhost"
     port = 9996
 
-    folder = "php/django_php/"
-
-    data_generator(ip , 20)
+    mac = ["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"]
+    add_nodes(mac, ip)
+    # data_generator(ip , 20)
     # time_check()
+

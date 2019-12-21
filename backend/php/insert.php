@@ -24,8 +24,7 @@
         }
      
         $result1 = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
-        $result2 = mysqli_query($connect, "SHOW Tables;");
-        // TODO: update nodes status, time_stamp
+        $result2 = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
 
         if ($result1) {$response["message"][1] = "Data successfully inserted";} 
         else {$response["message"][1] = "Data failed to insert";}
