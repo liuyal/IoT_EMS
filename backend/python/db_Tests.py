@@ -1,4 +1,4 @@
-import os, sys, time, datetime, requests, subprocess, serial
+import os, sys, time, datetime, requests, subprocess, serial, ipaddress
 from datetime import date, timedelta
 from random import seed
 from random import randint
@@ -76,7 +76,17 @@ if __name__ == "__main__":
     port = 9996
 
     mac = ["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"]
-    add_nodes(mac, ip)
+    # add_nodes(mac, ip)
     # data_generator(ip , 20)
     # time_check()
+
+
+
+
+
+
+
+
+
+
 

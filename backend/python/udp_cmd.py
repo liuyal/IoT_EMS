@@ -1,105 +1,106 @@
-import os, sys, threading, time
+import os, sys, threading, time, argparse, ipaddress, logging, queue, re
+from argparse import RawTextHelpFormatter
 import socket as socket
+import mysql.connector
+from mysql.connector import Error
+from mysql.connector import errorcode
+
+# TODO: Add logging
+def cslog(msg, flag="info"):
+    print(msg)
 
 
-def print_usage():
-    print("Usage: udp_cmd.py <IP>:<PORT> [Command]")
-    print("\tIP:\t\tNode(s) IPV4 Address (Default: Broadcast IP)")
-    print("\tPORT:\tNode(s) UDP listening port (Default: 9996)")
-    print("\tCommands:")
-    print("\t\t[fetch_data] - Tell Node(s) to send data to host")
-    print("\t\t[ping] - Tell Node(s) to send data to host")
-    print("\t\t[reboot] - Reboot Node(s)")
-    print("\t\t[set_ip|<IP>] - Set Node(s) host IP (where to send data)")
-    sys.exit("")
-
-
-def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
+def udp_broadcast(msg, v_flag=False, UDP_IP="192.168.1.255", UDP_PORT=9996):
     time.sleep(2)
-    print("Start Broadcasting: " + str(msg) + " to " + UDP_IP + ":" + str(UDP_PORT))
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    sock.sendto(msg, (UDP_IP, UDP_PORT))
-    sock.close()
-    print("Broadcast Done")
+    for item in msg:
+        if v_flag: cslog("Start Broadcasting: " + str(item) + " to " + UDP_IP + ":" + str(UDP_PORT))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.sendto(item, (UDP_IP, UDP_PORT))
+        sock.close()
+        time.sleep(1)
+    if v_flag: cslog("Broadcast Done")
 
 
-def udp_send(msg, UDP_IP="127.0.0.1", UDP_PORT=9996):
+def udp_send(msg, v_flag=False, UDP_IP="127.0.0.1", UDP_PORT=9996):
     time.sleep(2)
-    print("Start Sending: " + str(msg) + " to " + UDP_IP + ":" + str(UDP_PORT))
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(msg, (UDP_IP, UDP_PORT))
-    sock.close()
-    print("Send Done")
+    for item in msg:
+        if v_flag: cslog("Start Sending: " + str(item) + " to " + UDP_IP + ":" + str(UDP_PORT))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(item, (UDP_IP, UDP_PORT))
+        sock.close()
+        time.sleep(1)
+    if v_flag: cslog("Send Done")
 
 
-# TODO: Check/update db status
-def udp_listener(cmd, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
+def udp_listener(msg_queue, v_flag=False, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     data_list = []
+    p = re.compile(r'(?:[0-9a-fA-F]:?){12}')
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(time_out)
     sock.bind((UDP_IP, UDP_PORT))
     try:
-        print("Start Listener on: " + UDP_IP + ":" + str(UDP_PORT))
+        if v_flag: cslog("Start Listener on: " + UDP_IP + ":" + str(UDP_PORT))
         while True:
             data, address = sock.recvfrom(1024)
-            packet = {"ip": address[0], "port": address[1], "data": data}
-            data_list.append(packet)
-            print(str(address) + ": " + str(data))
+            mac = re.findall(p, str(data))
+            if len(mac) != 0:
+                packet = {"ip" : address[0], "port" : address[1], "mac" : mac, "data" : data, "time": int(time.time())}
+                data_list.append(packet)
+            if v_flag: cslog(str(address) + ": " + str(data))
     except socket.timeout:
-        print("Listening done, Closing socket")
+        if v_flag: cslog("Listening done, Closing socket")
         sock.close()
-
+    msg_queue.put(data_list)
 
 
 if __name__ == "__main__":
 
-    cmd_list = ["fetch_data", "ping", "reboot", "set_ip"]
-    cmd = ""
-    UDP_IP = "192.168.1.255"
-    UDP_PORT = 9996
-    socket_time_out = 5
+    parser = argparse.ArgumentParser(description='', formatter_class=RawTextHelpFormatter)
+    parser.add_argument("-f", "--fetch", action='store_true', help='Pull data from Node(s) and send to host')
+    parser.add_argument("-P", "--ping", action='store_true', help='Ping Node(s)')
+    parser.add_argument("-r", "--reboot",action='store_true', help='Reboot Node(s)')
+    parser.add_argument("-s", "--set", action='store', type=str, dest="HOST_IP", help='Set Node(s) host IP (where nodes will send data to)')
+    parser.add_argument("-ip", action='store', type=str, dest="NODE_IP", default="192.168.1.255", help='Send command to specified Node(s) IPV4 Address (Default: Broadcast IP)')
+    parser.add_argument("-p", action='store', type=int, dest="NODE_PORT", default=9996, help='Send command to specified Node(s) UDP listening port (Default: 9996)')
+    parser.add_argument("-t", action='store', type=int, default=5, help='UDP listener socket time out (in seconds)')
+    parser.add_argument('-u', action='store_true', help='Update Node Status in database with UDP response')
+    parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
+    input_arg = parser.parse_args()
 
-    try: cmd = sys.argv[1]
-    except: print_usage()
+    try: ipaddress.ip_address(str(input_arg.NODE_IP))
+    except: input_arg.NODE_IP = "192.168.1.255";
+    try:
+        if input_arg.NODE_PORT < 0 or input_arg.NODE_PORT > 65535: raise Exception("Invalid Port")
+    except: cslog("Invalid IP, using Default: 9996"); input_arg.NODE_PORT = 9996
+    try:
+        if input_arg.HOST_IP != None: ipaddress.ip_address(str(input_arg.HOST_IP))
+    except: parser.print_usage(); sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP));
 
-    if len(sys.argv) == 2:
-        in_list = False
-        for item in cmd_list:
-            if item in cmd: in_list = True; break;
-        if not in_list: print_usage()
-    elif len(sys.argv) == 3:
-        cmd = sys.argv[2]
-        try:
-            UDP_IP = sys.argv[1].split(":")[0]
-            socket.inet_aton(UDP_IP)
-        except socket.error: UDP_IP = "192.168.1.255"; print("Invalid IP, using Default: " + UDP_IP)
-        try:
-            UDP_PORT = int(sys.argv[1].split(":")[1])
-            if UDP_PORT < 0 or UDP_PORT > 65535: raise Exception("Invalid Port")
-        except Exception as error: UDP_PORT = 9996; print("Invalid Port, using Default: " + str(UDP_PORT))
-        in_list = False
-        for item in cmd_list:
-            if item in cmd: in_list = True; break;
-        if not in_list: print_usage()
+    cmd = []
+    if input_arg.fetch: cmd.append(b"[fetch_data]\n")
+    if input_arg.ping: cmd.append(b"[ping]\n")
+    if input_arg.reboot: cmd.append(b"[reboot]\n")
+    if input_arg.HOST_IP != None: cmd.append(("[set_ip|" + str(input_arg.HOST_IP) + "]\n").encode('utf8'))
+    if len(cmd) == 0: parser.print_help(); cslog("\nNo command parameters set, default to [Ping]"); input_arg.ping = True; cmd.append(b"[ping]\n")
 
-    msg = cmd.encode('utf-8') + b"\n"
-    if UDP_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(msg, UDP_IP, UDP_PORT))
-    else: thread_send = threading.Thread(target=udp_send, args=(msg, UDP_IP, UDP_PORT))
-    thread_listen = threading.Thread(target=udp_listener, args=(cmd, "0.0.0.0", UDP_PORT, socket_time_out))
+    if input_arg.verbose: cslog(input_arg)
+
+    msg_queue = queue.Queue()
+    if input_arg.NODE_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.verbose, input_arg.NODE_IP, input_arg.NODE_PORT))
+    else: thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.verbose, input_arg.NODE_IP, input_arg.NODE_PORT))
+    thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, input_arg.verbose, "0.0.0.0", input_arg.NODE_PORT, input_arg.t))
     thread_send.start()
     thread_listen.start()
     thread_send.join()
     thread_listen.join()
 
+    # TODO: Check/update db status
+    msg = msg_queue.get()
 
 
-
-
-
-
-
+    print()
 
 
 
