@@ -5,16 +5,16 @@ from mysql.connector import errorcode
 from datetime import date, timedelta, datetime
 
 time.sleep(10)
-logging.basicConfig(filename="./backup_logs.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+logging.basicConfig(filename="./nodes.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 logging.info("Back Up Started...")
 
 date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
 
 try:
     logging.info("Connecting to database nova.")
-    connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1')
-    # connection = mysql.connector.connect(host='192.168.1.150', database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
-    # connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='')
+    connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='', auth_plugin='mysql_native_password')
+    # connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1', auth_plugin='mysql_native_password')
+    # connection = mysql.connector.connect(host='192.168.1.1500', database='nova', user='nova', password='Airlink_1', auth_plugin='mysql_native_password')
 
     cursor = connection.cursor()
     cursor.execute("USE nova")
@@ -33,7 +33,7 @@ try:
         logging.error("Empty data Table, EXIT.")
         sys.exit("Empty data Table, EXIT.")
 
-    cmd_counter = 0;
+    cmd_counter = 0
     logging.info("Validating time, checking dates.")
     for item in time_list:
         data_date = time.strftime('%Y%m%d', time.gmtime(int(item[1])))
@@ -51,12 +51,12 @@ try:
             cursor.execute(insert_cmd)
             cursor.execute(remove_cmd)
             connection.commit()
-            cmd_counter += 1;
-
+            cmd_counter += 1
+    connection.close()
     if cmd_counter == 0: logging.info("No dates needed to be backed up.")
     if platform.system() == "linux" or platform.system() == "linux2": os.system("sudo apt-get clean")
     logging.info("Back Up Complete.")
-
+    logging.shutdown()
 except mysql.connector.Error as error:
     logging.error("Failed {}".format(error))
     print("Failed {}".format(error))
