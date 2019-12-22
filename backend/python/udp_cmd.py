@@ -1,5 +1,4 @@
 import os, sys, threading, time, argparse, ipaddress, logging, queue, re
-from argparse import RawTextHelpFormatter
 import socket as socket
 import mysql.connector
 from mysql.connector import Error
@@ -78,14 +77,12 @@ def update_node_db_status(update_list):
         cslog("Closing DB connection")
         connection.close()
     except Exception as error:
-        cslog("Failed {}".format(error),flag="error")
+        cslog("Failed {}".format(error), flag="error")
 
 
 if __name__ == "__main__":
 
-    logging.basicConfig(filename="./nodes.log", filemode='a',format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
-
-    parser = argparse.ArgumentParser(description='', formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-f", "--fetch", action='store_true', help='Pull data from Node(s) and send to host')
     parser.add_argument("-P", "--ping", action='store_true', help='Ping Node(s)')
     parser.add_argument("-r", "--reboot",action='store_true', help='Reboot Node(s)')
@@ -97,6 +94,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
     input_arg = parser.parse_args()
+
+    if input_arg.log: logging.basicConfig(filename="./nodes.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
     except: input_arg.NODE_IP = "192.168.1.255";
