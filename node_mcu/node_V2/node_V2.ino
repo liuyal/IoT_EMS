@@ -11,8 +11,8 @@
 DHT dht(dht_dpin, DHTTYPE);
 
 //DOTO: Serial set Wi-Fi & Save to EEPROM
-const char* ssid = "TELUS3854";
-const char* password = "tsp5df7yfy";
+const char* ssid = "";
+const char* password = "";
 IPAddress hostIP(0, 0, 0, 0);
 int ip_addr = 0;
 int port_addr = 4;
