@@ -1,11 +1,5 @@
 <?php
 
-    function console_log( $data ){
-      echo '<script>';
-      echo 'console.log('. json_encode( $data ) .')';
-      echo '</script>';
-    }
-
     ini_set('display_errors','on');
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
@@ -31,7 +25,15 @@
         }
      
         $result1 = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
-        $result2 = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
+
+        $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac='$mac';");
+
+        if($find_mac->num_rows == 0){
+            $result2 = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, '$time', true)");
+        }
+        else{
+            $result2 = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
+        }
 
         if ($result1) {$response["message"][1] = "Data successfully inserted";} 
         else {$response["message"][1] = "Data failed to insert";}

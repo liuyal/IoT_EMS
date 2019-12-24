@@ -11,6 +11,7 @@ def cslog(msg, flag="info"):
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
 
+
 def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
     time.sleep(2)
     for item in msg:
@@ -23,6 +24,7 @@ def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
         time.sleep(1)
     cslog("Broadcast Done.")
 
+
 def udp_send(msg, UDP_IP="127.0.0.1", UDP_PORT=9996):
     time.sleep(2)
     for item in msg:
@@ -32,6 +34,7 @@ def udp_send(msg, UDP_IP="127.0.0.1", UDP_PORT=9996):
         sock.close()
         time.sleep(1)
     cslog("Send Done.")
+
 
 def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     data_list = []
@@ -73,7 +76,7 @@ def update_node_db_status(update_list):
             cursor.execute(search_cmd)
             result = cursor.fetchall()
             if len(result) < 1:
-                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status) values('" +  str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE)"
+                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('" +  str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE)"
                 cursor.execute(add_node)
                 connection.commit()
             else:

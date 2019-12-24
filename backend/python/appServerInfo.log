@@ -1,0 +1,14 @@
+2019-12-23 17:15:12, [INFO] root, Started UDP Command Handler
+2019-12-23 17:15:12, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-23 17:15:12, [INFO] root, Start Listener on: 0.0.0.0:9996
+2019-12-23 17:15:14, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-23 17:15:14, [INFO] root, Packet: ('192.168.1.80', 64371)	b'[fetch_data]\n'
+2019-12-23 17:15:15, [INFO] root, Broadcast Done.
+2019-12-23 17:15:15, [INFO] root, Packet: ('192.168.1.74', 9996)	b'[BC:DD:C2:2F:47:79|data_sent|1577150114|21.60|48.00]\r\n'
+2019-12-23 17:15:15, [INFO] root, Packet: ('192.168.1.64', 9996)	b'[5C:CF:7F:AC:72:78|data_sent|1577150114|21.80|57.00]\r\n'
+2019-12-23 17:15:20, [INFO] root, Listening done, Closing socket.
+2019-12-23 17:15:20, [INFO] root, Updating Database status.
+2019-12-23 17:15:20, [INFO] root, Connecting to database nova.
+2019-12-23 17:15:20, [INFO] root, Executing updates.
+2019-12-23 17:15:20, [INFO] root, Closing DB connection
+2019-12-23 17:15:20, [INFO] root, UDP Command Handler Complete.
