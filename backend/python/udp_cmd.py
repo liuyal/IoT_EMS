@@ -10,6 +10,9 @@ def cslog(msg, flag="info"):
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
+        if flag == "critical": logging.critical(msg)
+        if flag == "warning": logging.warning(msg)
+        if flag == "debug": logging.debug(msg)
 
 
 def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
@@ -60,17 +63,11 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     msg_queue.put(mac_list)
 
 
-def update_node_db_status(update_list):
+def update_node_db_status(update_list, connection):
     try:
-        with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: cslog(exc)
-        cslog("Connecting to database nova.")
-        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        cslog("Updating node status.")
         cursor = connection.cursor()
         cursor.execute("USE nova")
-        cslog("Executing updates.")
-
         for item in update_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)
@@ -83,9 +80,6 @@ def update_node_db_status(update_list):
                 update_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
                 cursor.execute(update_cmd)
                 connection.commit()
-
-        cslog("Closing DB connection")
-        connection.close()
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
 
@@ -103,8 +97,10 @@ if __name__ == "__main__":
     parser.add_argument('-u', action='store_true', help='Update Node Status in database with UDP response')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
-    input_arg = parser.parse_args()
 
+    input_arg = parser.parse_args()
+    try: sys.argv[1]
+    except: parser.print_help(); sys.exit()
     if input_arg.log: logging.basicConfig(filename="./appServerInfo.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
@@ -123,7 +119,6 @@ if __name__ == "__main__":
     if input_arg.reboot: cmd.append(b"[reboot]\n")
     if input_arg.HOST_IP != None: cmd.append(("[set_ip|" + str(input_arg.HOST_IP) + "]\n").encode('utf8'))
     if len(cmd) == 0: parser.print_help(); cslog("No command parameters set, default to [Ping]"); input_arg.ping = True; cmd.append(b"[ping]\n")
-
     if input_arg.verbose: cslog("Input: " + str(input_arg))
 
     msg_queue = queue.Queue()
@@ -136,14 +131,20 @@ if __name__ == "__main__":
     thread_listen.join()
 
     if input_arg.u:
-        cslog("Updating Database status.")
         msg = msg_queue.get()
         mac_list = (list(set(msg_queue.get())))
         update_list = []
         for mac in mac_list:
             for item in reversed(msg):
                 if mac == item["mac"]: update_list.append(item); msg.pop(-1); break
-        update_node_db_status(update_list)
+        with open("server_info.yaml", 'r') as stream:
+            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc: cslog(exc)
+        cslog("Connecting to database nova.")
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        update_node_db_status(update_list, connection)
+        cslog("Closing DB connection")
+        connection.close()
 
     logging.shutdown()
     cslog("UDP Command Handler Complete.")
