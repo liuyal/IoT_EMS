@@ -29,9 +29,8 @@ date +%Y%m%d -s "20191217"
 date +%T -s "23:59:50"
 
 --CRON--
-* * * * * sudo python3 /var/www/html/python/udp_cmd.py get_data
-1 0 * * * sudo python3 /var/www/html/python/data_backup.py
-@midnight sudo python3 /var/www/html/python/data_backup.py
+* * * * * sudo python3 /var/www/html/Temperature_System/backend/python/udp_cmd.py -f -u -l
+@midnight sudo python3 /var/www/html/Temperature_System/backend/python/data_backup.py -v -l
 
 --BASH--
 mysqldump --databases nova > dump.sql

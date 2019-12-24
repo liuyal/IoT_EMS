@@ -11,8 +11,8 @@
 DHT dht(dht_dpin, DHTTYPE);
 
 //DOTO: Serial set Wi-Fi & Save to EEPROM
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "TELUS3854";
+const char* password = "tsp5df7yfy";
 IPAddress hostIP(0, 0, 0, 0);
 int ip_addr = 0;
 int port_addr = 4;
@@ -67,7 +67,7 @@ String get_data() {
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String http_insert = "http://" + hostIP.toString() + "/backend/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
+    String http_insert = "http://" + hostIP.toString() + "/Temperature_System/backend/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
     return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
     Serial_Print(http_insert + "\r\n");
     http.begin(http_insert);
