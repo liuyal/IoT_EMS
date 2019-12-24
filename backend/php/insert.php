@@ -1,4 +1,11 @@
 <?php
+
+    function console_log( $data ){
+      echo '<script>';
+      echo 'console.log('. json_encode( $data ) .')';
+      echo '</script>';
+    }
+
     ini_set('display_errors','on');
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");

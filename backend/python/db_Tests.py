@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from random import seed
 from random import randint
 from random import uniform
-
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
@@ -51,7 +50,7 @@ def data_generator(ip, n=10):
         epoch = randint(1575158400, 1575590400)
         temp = round(uniform(-10, 40), 2)
         hum = round(uniform(0, 100), 2)
-        insert_req = "http://" + ip +"/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        insert_req = "http://" + ip +"/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
         print(str(epoch) + " " + time.strftime('%Y%m%d', time.gmtime(epoch)) + " " + str(temp) + " " + str(hum) + "\n" + insert_req)
         print(response.json())
@@ -74,10 +73,10 @@ if __name__ == "__main__":
 
     ip = "localhost"
     port = 9996
-
     mac = ["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"]
+
     # add_nodes(mac, ip)
-    # data_generator(ip , 20)
+    data_generator(ip , 20)
     # time_check()
 
 

@@ -1,4 +1,4 @@
-import os, sys, time, requests, datetime
+import os, sys, time, requests, datetime, yaml
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
@@ -72,8 +72,10 @@ for key in new_data:
         add_cmd.append(cmd)
 
 try:
-    connection = mysql.connector.connect(host=ip, database='nova', user='root', password='')
-    # connection = mysql.connector.connect(host=ip, database='nova', user='zeus', password='Airlink_1', auth_plugin='mysql_native_password')
+    with open("server_info.yaml", 'r') as stream:
+        try: mysql_cred = yaml.safe_load(stream)
+        except yaml.YAMLError as exc: print(exc)
+    connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
     cursor = connection.cursor()
     cursor.execute("USE nova")
     for item in remove_cmd: cursor.execute(item)

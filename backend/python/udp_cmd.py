@@ -1,4 +1,4 @@
-import os, sys, threading, time, argparse, ipaddress, logging, queue, re
+import os, sys, threading, time, argparse, ipaddress, logging, queue, re, yaml
 import socket as socket
 import mysql.connector
 from mysql.connector import Error
@@ -10,7 +10,6 @@ def cslog(msg, flag="info"):
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
-
 
 def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
     time.sleep(2)
@@ -24,7 +23,6 @@ def udp_broadcast(msg, UDP_IP="192.168.1.255", UDP_PORT=9996):
         time.sleep(1)
     cslog("Broadcast Done.")
 
-
 def udp_send(msg, UDP_IP="127.0.0.1", UDP_PORT=9996):
     time.sleep(2)
     for item in msg:
@@ -34,7 +32,6 @@ def udp_send(msg, UDP_IP="127.0.0.1", UDP_PORT=9996):
         sock.close()
         time.sleep(1)
     cslog("Send Done.")
-
 
 def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     data_list = []
@@ -62,18 +59,28 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
 
 def update_node_db_status(update_list):
     try:
+        with open("server_info.yaml", 'r') as stream:
+            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc: cslog(exc)
         cslog("Connecting to database nova.")
-        connection = mysql.connector.connect(host='localhost', database='nova', user='root', password='', auth_plugin='mysql_native_password')
-        # connection = mysql.connector.connect(host='localhost', database='nova', user='nova', password='Airlink_1', auth_plugin='mysql_native_password')
-        # connection = mysql.connector.connect(host='192.168.1.1500', database='nova', user='nova', password='Airlink_1', auth_plugin='mysql_native_password')
-
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         cursor.execute("USE nova")
         cslog("Executing updates.")
+
         for item in update_list:
-            sql_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
-            cursor.execute(sql_cmd)
-            connection.commit()
+            search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
+            cursor.execute(search_cmd)
+            result = cursor.fetchall()
+            if len(result) < 1:
+                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status) values('" +  str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE)"
+                cursor.execute(add_node)
+                connection.commit()
+            else:
+                update_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
+                cursor.execute(update_cmd)
+                connection.commit()
+
         cslog("Closing DB connection")
         connection.close()
     except Exception as error:
@@ -95,7 +102,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
     input_arg = parser.parse_args()
 
-    if input_arg.log: logging.basicConfig(filename="./nodes.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    if input_arg.log: logging.basicConfig(filename="./appServerInfo.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
     except: input_arg.NODE_IP = "192.168.1.255";
