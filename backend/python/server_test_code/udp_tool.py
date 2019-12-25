@@ -33,12 +33,11 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
 
 if __name__ == "__main__":
 
-
     cmd = [b"[ping]"]
 
     msg_queue = queue.Queue()
     # thread_send = threading.Thread(target=udp_broadcast, args=(cmd, "192.168.1.255", 9996))
-    thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", 9997, 600))
+    thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", 9996, 600))
 
     # thread_send.start()
     thread_listen.start()

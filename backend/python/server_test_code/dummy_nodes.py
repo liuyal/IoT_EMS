@@ -51,7 +51,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
             msg = ("[" + mac + "|pong|" + host_ip + "|" + ip + "]\n")
             sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n","") + "\n")
 
-        # TODO: add missing commands
+        # TODO: add missing commands, and Scapy to change UDP Source IP
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(msg.encode("utf-8"), (host_ip, port))
@@ -72,8 +72,9 @@ if __name__ == "__main__":
     for i in range(1, n_nodes+1):
         random.seed(i)
         node_mac = rand_mac()
-        print("Node [" + str(i) + "]: " + node_mac)
-        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, "0.0.0.0", "192.168.1.103", 9996))
+        node_ip = "192.168.1." + str(i)
+        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, "192.168.1.103", 9996))
         thread_list.append(dummy_node_thread)
+        print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip)
     print()
     for item in thread_list: item.start()
