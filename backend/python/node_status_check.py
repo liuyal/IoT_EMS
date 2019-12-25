@@ -56,7 +56,7 @@ if __name__ == "__main__":
     try: sys.argv[1]
     except: parser.print_help(); sys.exit()
 
-    if input_arg.log: logging.basicConfig(filename="./appServerInfo.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     try:
         with open("server_info.yaml", 'r') as stream:

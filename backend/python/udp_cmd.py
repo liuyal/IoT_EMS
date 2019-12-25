@@ -101,7 +101,7 @@ if __name__ == "__main__":
     input_arg = parser.parse_args()
     try: sys.argv[1]
     except: parser.print_help(); sys.exit()
-    if input_arg.log: logging.basicConfig(filename="./appServerInfo.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
     except: input_arg.NODE_IP = "192.168.1.255";

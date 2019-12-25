@@ -53,7 +53,7 @@ def db_backup(connection):
             connection.commit()
             cmd_counter += 1
 
-    if cmd_counter == 0: logging.info("No dates needed to be backed up.")
+    if cmd_counter == 0: cslog("No data to be backed up.")
 
 
 if __name__ == "__main__":
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     try: sys.argv[1]
     except: parser.print_help(); sys.exit()
 
-    if input_arg.log: logging.basicConfig(filename="./appServerInfo.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
     cslog("Back Up Started...")
 
     date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
