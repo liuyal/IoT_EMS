@@ -20,6 +20,7 @@
 - [AP Config](https://www.diyhobi.com/install-wifi-hotspot-raspberry-pi-ubuntu-mate/)
 - [RFC 1812](https://tools.ietf.org/html/rfc1812#section-2)
 
+### CODE & CMD
 ```
 --TIME--
 TIMESTAMP = date +%Y%m%d
