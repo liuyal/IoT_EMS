@@ -18,7 +18,9 @@ li a:focus {
     height: 100%;
     position: fixed;
     overflow-y: auto;
-    padding-top: 55px;
+    padding-top: 50px;
+    z-index: 1;
+    
 }
 
 #sidebar {
@@ -28,6 +30,8 @@ li a:focus {
     height: 100%;
     transition: all 0.3s;
     background-color: rgb (52, 58, 64);
+    border-right: 1px solid #202020;
+    
 }
 
 #sidebar.active {

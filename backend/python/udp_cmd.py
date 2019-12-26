@@ -95,8 +95,8 @@ if __name__ == "__main__":
     parser.add_argument("-ip", action='store', type=str, dest="NODE_IP", default="192.168.1.255", help='Send command to specified Node(s) IPV4 Address (Default: Broadcast IP)')
     parser.add_argument("-p", action='store', type=int, dest="NODE_PORT", default=9996, help='Send command to specified Node(s) UDP listening port (Default: 9996)')
     parser.add_argument("-t", action='store', type=int, default=5, help='UDP listener socket time out (in seconds)')
-    parser.add_argument('-L', "--listen", action='store_true', help='UDP listen mode')
-    parser.add_argument('-u', action='store_true', help='Update Node Status in database with UDP response (-L flag must be set)')
+    parser.add_argument('-L', "--listen", action='store', type=int, default=0, dest="PORT", help='UDP listen mode on PORT')
+    parser.add_argument('-u', "--update", action='store_true', help='Update Node Status in database with UDP response (-L flag must be set)')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     except: parser.print_help(); sys.exit()
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
-    if not input_arg.listen: cslog("-L flag must be set for updating database. -h for help", "error")
+    if input_arg.update and input_arg.PORT < 1: cslog("-L flag must be set for updating database. -h for help", "error")
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
     except: input_arg.NODE_IP = "192.168.1.255";
@@ -123,18 +123,18 @@ if __name__ == "__main__":
     if input_arg.reboot: cmd.append(b"[reboot]\n")
     if input_arg.HOST_IP != None: cmd.append(("[set_ip|" + str(input_arg.HOST_IP) + "]\n").encode('utf8'))
     if len(cmd) == 0: parser.print_help(); cslog("No command parameters set, default to [Ping]"); input_arg.ping = True; cmd.append(b"[ping]\n")
-    if input_arg.verbose: cslog("Input: " + str(input_arg))
+    if input_arg.verbose: cslog("Input: " + str(input_arg).replace("Namespace",""))
 
     msg_queue = queue.Queue()
     if input_arg.NODE_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
     else: thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
-    if input_arg.listen: thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.NODE_PORT, input_arg.t))
+    if input_arg.PORT > 0: thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.PORT, input_arg.t))
     thread_send.start()
-    if input_arg.listen: thread_listen.start()
+    if input_arg.PORT > 0: thread_listen.start()
     thread_send.join()
-    if input_arg.listen: thread_listen.join()
+    if input_arg.PORT > 0: thread_listen.join()
 
-    if input_arg.u and input_arg.listen:
+    if input_arg.update and input_arg.listen:
         msg = msg_queue.get()
         mac_list = (list(set(msg_queue.get())))
         update_list = []

@@ -17,7 +17,7 @@
 
     <script src="https://kit.fontawesome.com/7f2e18d7c9.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
+
 
     <script src="js/main.js"></script>
     <script src="js/sidebar.js"></script>
@@ -69,37 +69,29 @@
 
 
         <main class="main">
-            <div class="main-header bg-dark">
-            </div>
+            <div class="main-header bg-dark"></div>
 
-            <div class="main-overview">
+            <div class="main-status">
                 <div class="overviewcard A">
-
                     <div class="overviewcard__label">Nodes Online</div>
                     <div class="overviewcard__info" id="n_online"></div>
                     <div class="overviewcard__icon"></div>
-
                 </div>
                 <div class="overviewcard B">
-
                     <div class="overviewcard__label">Temperature</div>
                     <div class="overviewcard__info" id="temp"></div>
                     <div class="overviewcard__icon"></div>
-
                 </div>
                 <div class="overviewcard C">
-
                     <div class="overviewcard__label">Humidity</div>
                     <div class="overviewcard__info" id="hum"></div>
                     <div class="overviewcard__icon"></div>
-
                 </div>
                 <div class="overviewcard D">
-
                     <div class="overviewcard__label">UTC Time</div>
                     <div class="overviewcard__info" id="current_time"></div>
                     <div class="overviewcard__icon">
-                        <button type="button" class="btn" onclick="fresh_data()">
+                        <button type="button" class="time_btn" onclick="">
                             <i class="material-icons md-1">settings</i>
                             <i class="material-icons md-2">arrow_drop_down</i>
                         </button>
@@ -107,6 +99,28 @@
                 </div>
             </div>
 
+
+
+            <div class="main-cards">
+                <div class="card A bg-dark">
+                    <div>Temperature</div>
+                </div>
+
+
+                <div class="card B bg-dark">
+                    <div>Humidity</div>
+                </div>
+
+            </div>
+
+
+            <div class="footer-cards">
+                <div class="f-card bg-dark">T</div>
+                <div class="f-card bg-dark">T</div>
+                <div class="f-card bg-dark">T</div>
+                <div class="f-card bg-dark">T</div>
+
+            </div>
 
         </main>
 

@@ -29,6 +29,7 @@ function fresh_data() {
 }
 
 
+
 function load_fresh() {
 
     window.setInterval(function () {
@@ -39,6 +40,7 @@ function load_fresh() {
         document.getElementById('current_time').innerHTML = h + ":" + m + ":" + s;
 
         fresh_data();
+        
 
     }, 1000);
 

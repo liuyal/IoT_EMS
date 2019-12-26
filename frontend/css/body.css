@@ -24,5 +24,6 @@ html {
         'main'
         'footer';
     height: 100vh;
+     position: relative;
 }
 
