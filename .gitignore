@@ -1,5 +1,7 @@
 __pycache__/
-DB_Backups/
+db_backups/
 .vscode/
+target/
 .idea/
 *.sql
+git_commit.py
