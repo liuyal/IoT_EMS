@@ -18,6 +18,7 @@ def rand_mac():
 def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     global data
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.settimeout(time_out)
     sock.bind((UDP_IP, UDP_PORT))
     try:
@@ -44,11 +45,11 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
                 epoch = int(time.time())
                 temp = round(random.uniform(-10, 40), 2)
                 hum = round(random.uniform(0, 100), 2)
-                # insert_req = "http://" + host_ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-                insert_req = "http://localhost/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+                insert_req = "http://" + host_ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+                # insert_req = "http://localhost/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
                 response = requests.get(insert_req)
                 msg = ("[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n")
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + str(response.json()) + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", " ") + str(response.json()) + "\n")
             elif "ping" in str(data):
                 msg = ("[" + mac + "|pong|" + dst_ip + "|" + ip + "]\n")
                 sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
@@ -93,4 +94,7 @@ if __name__ == "__main__":
         dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, "192.168.1.80", 9996))
         thread_list.append(dummy_node_thread)
         print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip)
-    for item in thread_list: item.start()
+    try:
+        for item in thread_list: item.start()
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt. Stopping script.")

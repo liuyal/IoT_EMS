@@ -42,7 +42,10 @@ sudo -H pip3 --default-timeout=1000 install --upgrade pip
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';
 ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
+
 CREATE USER 'zeus'@'192.168.1.80' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO 'zeus'@'192.168.1.80';
 ALTER USER 'zeus'@'192.168.1.80' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
+
+SELECT * FROM data ORDER BY time DESC LIMIT 1;
 ```

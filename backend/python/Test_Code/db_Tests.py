@@ -27,6 +27,7 @@ def request_test(ip):
     req = "http://" + ip + "/backend/php/show_tables.php"
     response = requests.get(req)
     data = response.json()["data"]
+    print(data)
 
 
 def time_check(ip):
@@ -153,8 +154,8 @@ if __name__ == "__main__":
 
     # data_generator(ip , 20)
     # add_nodes(mac)
-    # time_check(ip)
-    db_validate(ip)
+    time_check(ip)
+    # db_validate(ip)
 
 
 
