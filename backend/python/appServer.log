@@ -225,3 +225,124 @@
 2019-12-25 13:45:55, [INFO] root, Node: 79:42:bd:f2:21:06 last seen 0:00:37 seconds ago.
 2019-12-25 13:45:55, [INFO] root, Node: 82:b7:0e:ee:7f:1a last seen 1:52:23 hour ago. Updating status to offline.
 2019-12-25 13:45:55, [INFO] root, Closing DB connection
+2019-12-25 16:41:19, [INFO] root, Started UDP Command Handler
+2019-12-25 16:41:19, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, log=True, ping=False, reboot=False, t=5, u=False, verbose=True)
+2019-12-25 16:41:19, [INFO] root, Start Listener on: 0.0.0.0:9996
+2019-12-25 16:41:21, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.80', 62958)	b'[fetch_data]\n'
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.1', 9996)	b'[44:20:82:3c:fd:e6|data_sent|1577320880|47.53|31.94]\n'
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.5', 9996)	b'[82:b7:0e:ee:7f:1a|data_sent|1577320880|32.36|91.55]\n'
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.3', 9996)	b'[79:42:bd:f2:21:06|data_sent|1577320880|53.5|61.08]\n'
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.2', 9996)	b'[1c:2e:2b:b8:56:9d|data_sent|1577320880|82.07|20.08]\n'
+2019-12-25 16:41:21, [INFO] root, Packet: ('192.168.1.4', 9996)	b'[78:9b:34:ca:f5:4f|data_sent|1577320880|11.05|29.29]\n'
+2019-12-25 16:41:22, [INFO] root, Broadcast Done.
+2019-12-25 16:41:26, [INFO] root, Listening done, Closing socket.
+2019-12-25 16:41:26, [INFO] root, UDP Command Handler Complete.
+2019-12-25 16:53:05, [INFO] root, Started UDP Command Handler
+2019-12-25 16:53:05, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, log=True, ping=False, reboot=False, t=5, u=False, verbose=True)
+2019-12-25 16:53:05, [INFO] root, Start Listener on: 0.0.0.0:9996
+2019-12-25 16:53:07, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 16:53:07, [INFO] root, Packet: ('192.168.1.80', 63981)	b'[fetch_data]\n'
+2019-12-25 16:53:08, [INFO] root, Packet: ('192.168.1.3', 9996)	b'[79:42:bd:f2:21:06|data_sent|1577321586|54.06|27.07]\n'
+2019-12-25 16:53:08, [INFO] root, Packet: ('192.168.1.1', 9996)	b'[44:20:82:3c:fd:e6|data_sent|1577321586|82.71|51.76]\n'
+2019-12-25 16:53:08, [INFO] root, Packet: ('192.168.1.2', 9996)	b'[1c:2e:2b:b8:56:9d|data_sent|1577321586|67.37|58.15]\n'
+2019-12-25 16:53:08, [INFO] root, Broadcast Done.
+2019-12-25 16:53:13, [INFO] root, Listening done, Closing socket.
+2019-12-25 16:53:13, [INFO] root, UDP Command Handler Complete.
+2019-12-25 16:54:09, [INFO] root, Connecting to database nova.
+2019-12-25 16:54:09, [INFO] root, Checking node status.
+2019-12-25 16:54:09, [INFO] root, Node: 1c:2e:2b:b8:56:9d last seen 0:01:03 minute ago.
+2019-12-25 16:54:09, [INFO] root, Node: 44:20:82:3c:fd:e6 last seen 0:01:03 minute ago.
+2019-12-25 16:54:09, [INFO] root, Node: 78:9b:34:ca:f5:4f last seen 0:12:49 minutes ago. Updating status to offline.
+2019-12-25 16:54:09, [INFO] root, Node: 79:42:bd:f2:21:06 last seen 0:01:03 minute ago.
+2019-12-25 16:54:09, [INFO] root, Node: 82:b7:0e:ee:7f:1a last seen 0:12:49 minutes ago. Updating status to offline.
+2019-12-25 16:54:09, [INFO] root, Closing DB connection
+2019-12-25 17:25:06, [INFO] root, Connecting to database nova.
+2019-12-25 17:25:06, [INFO] root, Checking node status.
+2019-12-25 17:25:06, [INFO] root, Node: 1c:2e:2b:b8:56:9d last seen 0:32:00 minutes ago. Updating status to offline.
+2019-12-25 17:25:06, [INFO] root, Node: 44:20:82:3c:fd:e6 last seen 0:32:00 minutes ago. Updating status to offline.
+2019-12-25 17:25:06, [INFO] root, Node: 78:9b:34:ca:f5:4f last seen 0:43:46 minutes ago. Updating status to offline.
+2019-12-25 17:25:06, [INFO] root, Node: 79:42:bd:f2:21:06 last seen 0:32:00 minutes ago. Updating status to offline.
+2019-12-25 17:25:06, [INFO] root, Node: 82:b7:0e:ee:7f:1a last seen 0:43:46 minutes ago. Updating status to offline.
+2019-12-25 17:25:06, [INFO] root, Closing DB connection
+2019-12-25 17:25:11, [INFO] root, Started UDP Command Handler
+2019-12-25 17:25:11, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, log=True, ping=False, reboot=False, t=5, u=False, verbose=True)
+2019-12-25 17:25:11, [INFO] root, Start Listener on: 0.0.0.0:9996
+2019-12-25 17:25:13, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:25:13, [INFO] root, Packet: ('192.168.1.80', 50122)	b'[fetch_data]\n'
+2019-12-25 17:25:14, [INFO] root, Packet: ('192.168.1.2', 9996)	b'[1c:2e:2b:b8:56:9d|data_sent|1577323513|22.13|92.4]\n'
+2019-12-25 17:25:14, [INFO] root, Packet: ('192.168.1.1', 9996)	b'[44:20:82:3c:fd:e6|data_sent|1577323513|78.88|30.64]\n'
+2019-12-25 17:25:14, [INFO] root, Packet: ('192.168.1.3', 9996)	b'[79:42:bd:f2:21:06|data_sent|1577323513|53.97|45.34]\n'
+2019-12-25 17:25:14, [INFO] root, Broadcast Done.
+2019-12-25 17:25:19, [INFO] root, Listening done, Closing socket.
+2019-12-25 17:25:19, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:25:23, [INFO] root, Started UDP Command Handler
+2019-12-25 17:25:23, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, log=True, ping=False, reboot=False, t=5, u=False, verbose=True)
+2019-12-25 17:25:23, [INFO] root, Start Listener on: 0.0.0.0:9996
+2019-12-25 17:25:25, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:25:25, [INFO] root, Packet: ('192.168.1.80', 50132)	b'[fetch_data]\n'
+2019-12-25 17:25:26, [INFO] root, Packet: ('192.168.1.2', 9996)	b'[1c:2e:2b:b8:56:9d|data_sent|1577323525|41.19|11.35]\n'
+2019-12-25 17:25:26, [INFO] root, Packet: ('192.168.1.3', 9996)	b'[79:42:bd:f2:21:06|data_sent|1577323525|86.6|13.81]\n'
+2019-12-25 17:25:26, [INFO] root, Packet: ('192.168.1.1', 9996)	b'[44:20:82:3c:fd:e6|data_sent|1577323525|72.18|24.19]\n'
+2019-12-25 17:25:26, [INFO] root, Broadcast Done.
+2019-12-25 17:25:31, [INFO] root, Listening done, Closing socket.
+2019-12-25 17:25:31, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:34:18, [INFO] root, Started UDP Command Handler
+2019-12-25 17:34:18, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=False, verbose=True)
+2019-12-25 17:34:20, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:34:21, [INFO] root, Broadcast Done.
+2019-12-25 17:34:21, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:37:05, [INFO] root, Started UDP Command Handler
+2019-12-25 17:37:05, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:37:07, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:37:08, [INFO] root, Broadcast Done.
+2019-12-25 17:37:08, [ERROR] root, -L (--listen) flag must be set for updating database
+2019-12-25 17:37:08, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:37:48, [INFO] root, Started UDP Command Handler
+2019-12-25 17:37:48, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:37:50, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:37:51, [INFO] root, Broadcast Done.
+2019-12-25 17:37:51, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:37:51, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:38:35, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:38:35, [INFO] root, Started UDP Command Handler
+2019-12-25 17:38:35, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:38:37, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:38:38, [INFO] root, Broadcast Done.
+2019-12-25 17:38:38, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:40:19, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:40:19, [INFO] root, Started UDP Command Handler
+2019-12-25 17:40:19, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:40:21, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:40:22, [INFO] root, Broadcast Done.
+2019-12-25 17:40:22, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:40:27, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:40:27, [INFO] root, Started UDP Command Handler
+2019-12-25 17:40:27, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:40:29, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:40:30, [INFO] root, Broadcast Done.
+2019-12-25 17:40:30, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:41:01, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:41:01, [INFO] root, Started UDP Command Handler
+2019-12-25 17:41:01, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:41:03, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:41:04, [INFO] root, Broadcast Done.
+2019-12-25 17:41:04, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:41:10, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:41:10, [INFO] root, Started UDP Command Handler
+2019-12-25 17:41:10, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:41:12, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:41:13, [INFO] root, Broadcast Done.
+2019-12-25 17:41:13, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:41:39, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:41:39, [INFO] root, Started UDP Command Handler
+2019-12-25 17:41:39, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:41:41, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:41:42, [INFO] root, Broadcast Done.
+2019-12-25 17:41:42, [INFO] root, UDP Command Handler Complete.
+2019-12-25 17:41:56, [ERROR] root, -L flag must be set for updating database. -h for help
+2019-12-25 17:41:56, [INFO] root, Started UDP Command Handler
+2019-12-25 17:41:56, [INFO] root, Input: Namespace(HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, fetch=True, listen=False, log=True, ping=False, reboot=False, t=5, u=True, verbose=True)
+2019-12-25 17:41:58, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-25 17:41:59, [INFO] root, Broadcast Done.
+2019-12-25 17:41:59, [INFO] root, UDP Command Handler Complete.

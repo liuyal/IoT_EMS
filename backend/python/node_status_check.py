@@ -3,9 +3,11 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
+# https://stackoverflow.com/questions/287871/how-to-print-colored-text-in-terminal-in-python
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose: print(msg)
+    if input_arg.verbose and flag == "info": print(msg)
+    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)

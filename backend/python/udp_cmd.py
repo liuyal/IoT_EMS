@@ -6,7 +6,8 @@ from mysql.connector import errorcode
 
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose: print(msg)
+    if input_arg.verbose and flag == "info": print(msg)
+    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
@@ -94,7 +95,8 @@ if __name__ == "__main__":
     parser.add_argument("-ip", action='store', type=str, dest="NODE_IP", default="192.168.1.255", help='Send command to specified Node(s) IPV4 Address (Default: Broadcast IP)')
     parser.add_argument("-p", action='store', type=int, dest="NODE_PORT", default=9996, help='Send command to specified Node(s) UDP listening port (Default: 9996)')
     parser.add_argument("-t", action='store', type=int, default=5, help='UDP listener socket time out (in seconds)')
-    parser.add_argument('-u', action='store_true', help='Update Node Status in database with UDP response')
+    parser.add_argument('-L', "--listen", action='store_true', help='UDP listen mode')
+    parser.add_argument('-u', action='store_true', help='Update Node Status in database with UDP response (-L flag must be set)')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
@@ -102,6 +104,8 @@ if __name__ == "__main__":
     try: sys.argv[1]
     except: parser.print_help(); sys.exit()
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+
+    if not input_arg.listen: cslog("-L flag must be set for updating database. -h for help", "error")
 
     try: ipaddress.ip_address(str(input_arg.NODE_IP))
     except: input_arg.NODE_IP = "192.168.1.255";
@@ -124,13 +128,13 @@ if __name__ == "__main__":
     msg_queue = queue.Queue()
     if input_arg.NODE_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
     else: thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
-    thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.NODE_PORT, input_arg.t))
+    if input_arg.listen: thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.NODE_PORT, input_arg.t))
     thread_send.start()
-    thread_listen.start()
+    if input_arg.listen: thread_listen.start()
     thread_send.join()
-    thread_listen.join()
+    if input_arg.listen: thread_listen.join()
 
-    if input_arg.u:
+    if input_arg.u and input_arg.listen:
         msg = msg_queue.get()
         mac_list = (list(set(msg_queue.get())))
         update_list = []

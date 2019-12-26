@@ -48,4 +48,5 @@ GRANT ALL PRIVILEGES ON *.* TO 'zeus'@'192.168.1.80';
 ALTER USER 'zeus'@'192.168.1.80' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
 
 SELECT * FROM data ORDER BY time DESC LIMIT 1;
+SELECT COUNT(*) FROM nodes WHERE status=true;
 ```

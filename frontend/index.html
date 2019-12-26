@@ -76,30 +76,30 @@
                 <div class="overviewcard A">
 
                     <div class="overviewcard__label">Nodes Online</div>
-                    <div class="overviewcard__info">1</div>
+                    <div class="overviewcard__info" id="n_online"></div>
                     <div class="overviewcard__icon"></div>
 
                 </div>
                 <div class="overviewcard B">
 
                     <div class="overviewcard__label">Temperature</div>
-                    <div class="overviewcard__info">23.00&ordm;C</div>
+                    <div class="overviewcard__info" id="temp"></div>
                     <div class="overviewcard__icon"></div>
 
                 </div>
                 <div class="overviewcard C">
 
                     <div class="overviewcard__label">Humidity</div>
-                    <div class="overviewcard__info">49.00%</div>
+                    <div class="overviewcard__info" id="hum"></div>
                     <div class="overviewcard__icon"></div>
 
                 </div>
                 <div class="overviewcard D">
 
                     <div class="overviewcard__label">UTC Time</div>
-                    <div class="overviewcard__info" id="current_time">00:00:00</div>
+                    <div class="overviewcard__info" id="current_time"></div>
                     <div class="overviewcard__icon">
-                        <button type="button" class="btn">
+                        <button type="button" class="btn" onclick="fresh_data()">
                             <i class="material-icons md-1">settings</i>
                             <i class="material-icons md-2">arrow_drop_down</i>
                         </button>
