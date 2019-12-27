@@ -3,5 +3,6 @@ db_backups/
 .vscode/
 target/
 .idea/
+*.link
 *.sql
 git_commit.py
