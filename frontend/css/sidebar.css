@@ -34,7 +34,7 @@ li a:focus {
     
 }
 
-#sidebar.active {
+#sidebar.collapsed {
     margin-left: -96px;
     height: 100%;
 }
@@ -80,7 +80,7 @@ a[data-toggle="collapse"] {
         margin-left: 0;
     }
 
-    #sidebar.active {
+    #sidebar.collapsed {
         margin-left: -96px;
     }
 
@@ -88,7 +88,7 @@ a[data-toggle="collapse"] {
         width: 100%;
     }
 
-    #content.active {
+    #content.collapsed {
         width: calc(100% - 250px);
     }
 

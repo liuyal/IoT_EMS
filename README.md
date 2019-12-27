@@ -1,8 +1,12 @@
 # Temperature_System
 
+
 ## Server
 
+
+
 ## Nodes
+
 
 
 ## Django Guides
@@ -11,14 +15,17 @@
  - [Multi-Table Single Model](https://stackoverflow.com/questions/5036357/single-django-model-multiple-tables)
  - [Celery Periodic Tasks](https://docs.celeryproject.org/en/latest/userguide/periodic-tasks.html)
  - [Background Tasks](https://django-background-tasks.readthedocs.io/en/latest/)
+ - [python CRONTAB](https://pypi.org/project/python-crontab/) 
  - [Django Socket](https://pypi.org/project/django-socket-server/)
  - [Twisted](https://twistedmatrix.com/trac/)
 
 
 ## MISC
-
 - [AP Config](https://www.diyhobi.com/install-wifi-hotspot-raspberry-pi-ubuntu-mate/)
 - [RFC 1812](https://tools.ietf.org/html/rfc1812#section-2)
+- [Rest API Code](https://www.restapitutorial.com/httpstatuscodes.html)
+
+
 
 ### CODE & CMD
 ```

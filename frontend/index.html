@@ -13,12 +13,13 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-    <script src="https://kit.fontawesome.com/7f2e18d7c9.js" crossorigin="anonymous"></script>
+    <script rel="preload" src="https://kit.fontawesome.com/7f2e18d7c9.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <script src="js/main.js"></script>
     <script src="js/sidebar.js"></script>
+    <script src="js/main.js"></script>
     <link rel="stylesheet" href="css/body.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/sidebar.css">
@@ -51,20 +52,18 @@
         </header>
 
 
-
         <aside class="sidenav bg-dark">
             <div class="side_container">
                 <nav id="sidebar" class="bg-dark">
                     <ul class="list-unstyled components">
                         <li class="sidebtn active"><a href="index.html">Dashboard<i class="fas fa-tachometer-alt fa-fw"></i> </a></li>
                         <li class="sidebtn "><a href="#charts.html">Charts<i class="fas fa-chart-bar fa-fw"></i></a></li>
-                        <li class="sidebtn"><a href="#nodes.html">Nodes<i class="fas fa-map-marker-alt fa-fw"></i></a></li>
-                        <li class="sidebtn"><a href="#settings.html">Setting<i class="fas fa-cog fa-fw"></i></a></li>
+                        <li class="sidebtn "><a href="#nodes.html">Nodes<i class="fas fa-map-marker-alt fa-fw"></i></a></li>
+                        <li class="sidebtn "><a href="#settings.html">Setting<i class="fas fa-cog fa-fw"></i></a></li>
                     </ul>
                 </nav>
             </div>
         </aside>
-
 
 
         <main class="main">
@@ -72,32 +71,31 @@
 
             <div class="main-status">
                 <div class="overviewcard A">
-                    <div class="overviewcard__label">Nodes Online</div>
-                    <div class="overviewcard__info" id="n_online"></div>
-                    <div class="overviewcard__icon"></div>
+                    <div class="overviewcard__label w3-animate-opacity">Nodes Online</div>
+                    <div class="overviewcard__info w3-animate-opacity" id="n_online"></div>
+                    <div class="overviewcard__icon" align="center"><i class="material-icons clock" id="wifi_on">wifi_off</i></div>
                 </div>
                 <div class="overviewcard B">
-                    <div class="overviewcard__label">Temperature</div>
-                    <div class="overviewcard__info" id="temp"></div>
-                    <div class="overviewcard__icon"></div>
+                    <div class="overviewcard__label w3-animate-opacity">Temperature</div>
+                    <div class="overviewcard__info w3-animate-opacity" id="temp"></div>
+                    <div class="overviewcard__icon" align="center"><i class="fas fa-thermometer-half status_icon"></i></div>
                 </div>
                 <div class="overviewcard C">
-                    <div class="overviewcard__label">Humidity</div>
-                    <div class="overviewcard__info" id="hum"></div>
-                    <div class="overviewcard__icon"></div>
+                    <div class="overviewcard__label w3-animate-opacity">Humidity</div>
+                    <div class="overviewcard__info w3-animate-opacity" id="hum"></div>
+                    <div class="overviewcard__icon" align="center"><i class="material-icons clock">waves</i></div>
                 </div>
                 <div class="overviewcard D">
-                    <div class="overviewcard__label">UTC Time</div>
-                    <div class="overviewcard__info" id="current_time"></div>
-                    <div class="overviewcard__icon">
-                        <button type="button" class="time_btn" onclick="">
-                            <i class="material-icons md-1">settings</i>
-                            <i class="material-icons md-2">arrow_drop_down</i>
-                        </button>
-                    </div>
+                    <div class="overviewcard__label w3-animate-opacity">UTC Time</div>
+                    <div class="overviewcard__info w3-animate-opacity" id="current_time"></div>
+                    <div class="overviewcard__icon" align="center"><i class="material-icons clock">access_time</i></div>
+
+                    <button type="button" class="time_btn" onclick="">
+                        <i class="material-icons md-1">settings</i>
+                        <i class="material-icons md-2">arrow_drop_down</i>
+                    </button>
                 </div>
             </div>
-
 
 
             <div class="main-cards">
@@ -105,11 +103,9 @@
                     <div>Temperature</div>
                 </div>
 
-
                 <div class="card B bg-dark">
                     <div>Humidity</div>
                 </div>
-
             </div>
 
 
@@ -118,19 +114,14 @@
                 <div class="f-card bg-dark">T</div>
                 <div class="f-card bg-dark">T</div>
                 <div class="f-card bg-dark">T</div>
-
             </div>
+
 
         </main>
 
-
-
-        <footer class="footer"></footer>
+        <!--        <footer class="footer"></footer>-->
 
     </div>
-
-
-
 
     <!--
     <div class="container-fluid">

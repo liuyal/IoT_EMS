@@ -53,7 +53,6 @@ def db_backup(connection):
             cursor.execute(remove_cmd)
             connection.commit()
             cmd_counter += 1
-
     if cmd_counter == 0: cslog("No data to be backed up.")
 
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
 
     input_arg = parser.parse_args()
     try: sys.argv[1]
-    except: parser.print_help(); sys.exit()
+    except: parser.print_help()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
     cslog("Back Up Started...")

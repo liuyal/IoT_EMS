@@ -1,18 +1,27 @@
-import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml
-from datetime import date, timedelta
-from random import seed
-from random import randint
-from random import uniform
+import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading
+from datetime import date, timedelta, timezone
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
 
-def sql_connector_test(ip):
+def rand_mac():
+    a = random.randint(0, 255)
+    b = random.randint(0, 255)
+    c = random.randint(0, 255)
+    d = random.randint(0, 255)
+    e = random.randint(0, 255)
+    f = random.randint(0, 255)
+    return "%02x:%02x:%02x:%02x:%02x:%02x" % (a, b, c, d, e, f)
+
+
+def sql_connector_test():
     try:
-        with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: print(exc)
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         cursor.execute("USE nova")
@@ -48,28 +57,30 @@ def time_check(ip):
                 print("\t" + str(times))
 
 
-def data_generator(ip, n=10):
-    for _ in range(n):
-        mac = "BC:DD:C2:2F:47:79"
-        epoch = randint(1575158400, 1575590400)
-        temp = round(uniform(-10, 40), 2)
-        hum = round(uniform(0, 100), 2)
-        insert_req = "http://" + ip +"/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+def random_data_generator(ip, n=10):
+    for i in range(0, n):
+        random.seed(i)
+        mac = rand_mac()
+        epoch = random.randint(1576800000, 1577232000)
+        temp = round(random.uniform(-10, 50), 2)
+        hum = round(random.uniform(0, 100), 2)
+        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
-        print(str(epoch) + " " + time.strftime('%Y%m%d', time.gmtime(epoch)) + " " + str(temp) + " " + str(hum) + "\n" + insert_req)
-        print(response.json())
+        print(time.strftime('%Y%m%d %h:%m:%s', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
 
 
 def add_nodes(mac):
     try:
-        with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: print(exc)
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         cursor.execute("USE nova")
         for item in mac:
-            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 9996, 0, FALSE)")
+            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, FALSE)")
             connection.commit()
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
@@ -85,7 +96,6 @@ def db_validate(ip):
     data = {}
     response = requests.get(show_tables)
     table_resp = response.json()["data"]
-
     for item in table_resp:
         tables.append(item["table"])
         main_table.append(item["table"])
@@ -95,13 +105,11 @@ def db_validate(ip):
     main_table.remove("nodes")
     main_table.remove("system_config")
     del wrong_data["nodes"], wrong_data["system_config"]
-
     for item in tables:
         data[item] = []
         response = requests.get(read_table + item)
         content = response.json()["data"]
         for each in content: data[item].append(each)
-
     for line in data:
         temp_list = data[line]
         for item in temp_list:
@@ -134,35 +142,59 @@ def db_validate(ip):
             cmd = "INSERT INTO " + key + "(mac,time,temp,hum) VALUES('" + str(new_data[key][i]["mac"]) + "'," + str(new_data[key][i]["time"]) + "," + str(new_data[key][i]["temp"]) + "," + str(new_data[key][i]["hum"]) + ");"
             add_cmd.append(cmd)
     try:
-        with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: print(exc)
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         cursor.execute("USE nova")
-        for item in remove_cmd: cursor.execute(item)
-        for item in add_cmd: cursor.execute(item)
+        for cmd_item in remove_cmd: cursor.execute(cmd_item)
+        for cmd_item in add_cmd: cursor.execute(cmd_item)
     except mysql.connector.Error as error:
-        print(str(item) + "\nFailed access table {}".format(error))
+        print(str(cmd_item) + "\nFailed access table {}".format(error))
+
+
+def data_generator(ip, mac, start, end):
+    epoch = int(start)
+    while epoch < int(end):
+        temp = round(random.uniform(-10, 50), 2)
+        hum = round(random.uniform(0, 100), 2)
+        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        response = requests.get(insert_req)
+        sys.stdout.write(time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
+        epoch = epoch + 60
+
+
+def generator_wrapper(ip, mac, start_date, end_date, threads):
+    epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    Delta = int(epoch_end - epoch_start)
+    n_requests = int(Delta / 60)
+    req_per_threads = int(n_requests / threads)
+    print("Start:\t" + str(epoch_start))
+    print("End:\t" + str(epoch_end))
+    print("Delta:\t" + str(Delta))
+    print("n_req:\t" + str(n_requests))
+    print("req/t:\t" + str(req_per_threads))
+    list = []
+    thread_list = []
+    for i in range(0, threads):
+        list.append(epoch_start)
+        epoch_start = epoch_start + req_per_threads * 60
+    list.append(list[-1] + req_per_threads * 60)
+    for i in range(0, threads):
+        gen_thread = threading.Thread(target=data_generator, args=(ip, mac, list[i], list[i + 1]))
+        thread_list.append(gen_thread)
+    for item in thread_list: item.start()
 
 
 if __name__ == "__main__":
 
     ip = "localhost"
-    port = 9996
-    mac = ["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"]
-
-    # data_generator(ip , 20)
-    # add_nodes(mac)
-    time_check(ip)
+    generator_wrapper(ip="localhost", mac="1c:2e:2b:b8:56:9d", start_date=20191227, end_date=20191228, threads=40)
+    # random_data_generator(ip, 20)
+    # add_nodes(["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"])
+    # time_check(ip)
     # db_validate(ip)
-
-
-
-
-
-
-
-
-
-

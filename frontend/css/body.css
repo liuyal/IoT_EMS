@@ -14,7 +14,6 @@ html {
     box-sizing: border-box;
 }
 
-
 .grid-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -24,6 +23,5 @@ html {
         'main'
         'footer';
     height: 100vh;
-     position: relative;
+    position: relative;
 }
-

@@ -11,8 +11,7 @@ def rand_mac():
     d = random.randint(0, 255)
     e = random.randint(0, 255)
     f = random.randint(0, 255)
-    mac = "%02x:%02x:%02x:%02x:%02x:%02x" % (a, b, c, d, e, f)
-    return mac
+    return "%02x:%02x:%02x:%02x:%02x:%02x" % (a, b, c, d, e, f)
 
 
 def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):

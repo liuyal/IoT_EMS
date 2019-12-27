@@ -5,10 +5,14 @@
     transition-duration: 0.3s;
 }
 
-.main.active {
+.main.collapsed {
     transition-duration: 0.3s;
     margin-left: calc(140px - 96px);
 }
+
+/* ---------------------------------------------------
+    Header
+----------------------------------------------------- */
 
 .main-header {
     display: flex;
@@ -19,6 +23,10 @@
     color: slategray;
     border-bottom: 1px solid #202020;
 }
+
+/* ---------------------------------------------------
+    Status
+----------------------------------------------------- */
 
 .main-status {
     display: grid;
@@ -61,32 +69,49 @@
     background-color: rgb(248, 108, 107);
 }
 
+.overviewcard__label {
+    position: absolute;
+    top: 75px;
+    left: 25px;
+    font-size: 18px;
+    animation-duration: 1s;
+}
+
+.overviewcard__info {
+    font-size: 35px;
+    position: absolute;
+    top: 20px;
+    left: 25px;
+    animation-duration: 1s;
+}
+
 .overviewcard__icon {
     position: absolute;
-    top: 10px;
-    right: 5px;
-    height: 30px;
-    width: 50px;
+    bottom: 10px;
+    right: 15px;
+    width: 70px;
+    height: 70px;
 }
 
-.material-icons.md-1 {
-    position: absolute;
-    font-size: 20px;
-    color: white;
-    top: 10px;
-    right: 25px;
+.fas.status_icon {
+    font-size: 70px;
+    color: black;
+    opacity: 0.2;
+    animation-duration: 1s;
 }
 
-.material-icons.md-2 {
-    position: absolute;
-    font-size: 20px;
-    color: white;
-    top: 6px;
-    right: 7px;
+.material-icons.clock {
+    font-size: 70px;
+    color: black;
+    opacity: 0.2;
+    animation-duration: 1s;
 }
 
 .time_btn {
-    height: 30px;
+    position: absolute;
+    top: 8px;
+    right: 0px;
+    height: 25px;
     width: 45px;
     background-color: Transparent;
     background-repeat: no-repeat;
@@ -99,19 +124,26 @@
     outline: none;
 }
 
-.overviewcard__label {
+.material-icons.md-1 {
     position: absolute;
-    top: 75px;
-    left: 25px;
-    font-size: 18px;
+    top: 6px;
+    right: 25px;
+    font-size: 17px;
+    color: white;
 }
 
-.overviewcard__info {
-    font-size: 35px;
+.material-icons.md-2 {
     position: absolute;
-    top: 20px;
-    left: 25px;
+    top: 0px;
+    right: 7px;
+    font-size: 20px;
+    color: white;
 }
+
+
+/* ---------------------------------------------------
+    Graphs
+----------------------------------------------------- */
 
 .main-cards {
     column-count: 1;
@@ -120,22 +152,28 @@
 }
 
 .card {
-    color: white;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    border: 1px solid #202020;
+    border-radius: 4px;
+    color: white;
     width: 100%;
     height: 485px;
     padding: 25px;
     margin-bottom: 20px;
     font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box;
-    border: 1px solid #202020;
-    border-radius: 4px;
+    
+    font-size: 20px;
 }
 
 .card.A {}
 
 .card.B {}
+
+/* ---------------------------------------------------
+    FootCard
+----------------------------------------------------- */
 
 .footer-cards {
     font-family: 'Montserrat', sans-serif;
@@ -143,7 +181,7 @@
     grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
     grid-auto-rows: 175px;
     grid-gap: 20px;
-    margin: -20px 20px -10px 20px;
+    margin: -20px 20px 20px 20px;
     color: wheat
 }
 
@@ -158,16 +196,6 @@
 }
 
 
-.footer {
-    grid-area: footer;
-    position: absolute;
-    bottom: 0;
-    height: 15px;
-    width: 100%;
-    z-index: 0;
-    margin: 0px 0px 0px 0px;
-    background-color: dimgray;
-}
 
 /* ---------------------------------------------------
     MEDIAQUERIES

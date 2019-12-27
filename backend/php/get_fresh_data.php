@@ -23,9 +23,15 @@
     $count = mysqli_fetch_assoc($n_online);
     $data = mysqli_fetch_assoc($temp_hum);
 
-    if ($n_online && $data) {
-        $response["message"][1] = "Fresh Data Found";
+    if ($n_online) {
         $response["message"]["online"] = $count["count"];
+    }
+    else {
+        $response["message"]["online"] = 0;
+    }
+
+    if ($data) {
+        $response["message"][1] = "Fresh Data Found";
         $response["message"]["mac"] = $data["mac"];
         $response["message"]["temp"] = $data["temp"];
         $response["message"]["hum"] = $data["hum"];
@@ -33,8 +39,7 @@
     }   
     else {
         $response["message"][1] = "No Data Found";
-        $response["message"]["online"] = 0;
-        $response["message"]["mac"] = "";
+        $response["message"]["mac"] = "00:00:00:00:00:00";
         $response["message"]["temp"] = 0.00;
         $response["message"]["hum"] = 0.00;
         $response["success"] = 0;
