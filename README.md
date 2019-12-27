@@ -42,11 +42,12 @@ date +%T -s "23:59:50"
 @midnight sudo python3 /var/www/html/Temperature_System/backend/python/data_backup.py -v -l
 
 --BASH--
-mysqldump --databases nova > dump.sql
 netstat -tlpn | grep mysql
 sudo -H pip3 --default-timeout=1000 install --upgrade pip
 
 --SQL--
+mysqldump --databases nova > dump.sql
+
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';
 ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  

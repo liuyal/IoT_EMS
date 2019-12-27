@@ -20,6 +20,8 @@
 
     <script src="js/sidebar.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/main.js"></script>
+
     <link rel="stylesheet" href="css/body.css">
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/sidebar.css">
@@ -67,7 +69,9 @@
 
 
         <main class="main">
-            <div class="main-header bg-dark"></div>
+            <div class="main-header bg-dark">
+                <button type="button" onclick="load_graph_data()">TEST A</button>
+            </div>
 
             <div class="main-status">
                 <div class="overviewcard A">
@@ -90,7 +94,7 @@
                     <div class="overviewcard__info w3-animate-opacity" id="current_time"></div>
                     <div class="overviewcard__icon" align="center"><i class="material-icons clock">access_time</i></div>
 
-                    <button type="button" class="time_btn" onclick="load_graph_data()">
+                    <button type="button" class="time_btn" onclick="">
                         <i class="material-icons md-1">settings</i>
                         <i class="material-icons md-2">arrow_drop_down</i>
                     </button>

@@ -4,7 +4,6 @@
     header("Content-Type: application/json; charset=UTF-8");
 
     $response = array();
-
     $filepath = realpath (dirname(__FILE__));
     require_once($filepath."/dbconfig.php");
 
@@ -33,8 +32,8 @@
     else {
     	$response["success"] = 0;
         $response["message"][1] = "No tables found";
-        
     }
+
     echo json_encode($response);
     mysqli_close($connect);
 ?>
