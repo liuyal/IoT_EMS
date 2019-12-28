@@ -24,7 +24,7 @@ def sql_connector_test():
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE nova")
+        cursor.execute("USE " + str(connection.database))
         cursor.execute("SHOW TABLES")
         tables = cursor.fetchall()
         print(tables)
@@ -33,7 +33,7 @@ def sql_connector_test():
 
 
 def request_test(ip):
-    req = "http://" + ip + "/backend/php/show_tables.php"
+    req = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
     response = requests.get(req)
     data = response.json()["data"]
     print(data)
@@ -102,7 +102,7 @@ def db_validate(ip):
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE nova")
+        cursor.execute("USE " + mysql_cred["DATABASE"])
         for cmd_item in remove_cmd: cursor.execute(cmd_item)
         for cmd_item in add_cmd: cursor.execute(cmd_item)
     except mysql.connector.Error as error:
@@ -136,10 +136,10 @@ def add_nodes(mac):
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE nova")
+        cursor.execute("USE " + str(connection.database))
         for item in mac:
             print("Adding node: " + str(item))
-            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, FALSE, FALSE)")
+            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, false, false)")
             connection.commit()
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
@@ -151,8 +151,7 @@ def random_data_generator(mac_list, ip, start_date, end_date, n=50):
     for i in range(0, n):
         # random.seed(i)
         # mac = rand_mac()
-        index = random.randint(0, len(mac_list) - 1)
-        mac = mac_list[index]
+        mac = mac_list[random.randint(0, len(mac_list) - 1)]
         epoch = random.randint(epoch_start, epoch_end)
         temp = round(random.uniform(-10, 50), 2)
         hum = round(random.uniform(0, 100), 2)
@@ -202,5 +201,6 @@ if __name__ == "__main__":
     # generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191225, end_date=20191228, threads=40)
     # add_nodes(mac_list)
     # random_data_generator(mac_list, ip, start_date=20191220, end_date=20191227, n=500)
+    # sql_connector_test()
     time_check(ip)
     # db_validate(ip)

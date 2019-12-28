@@ -70,7 +70,7 @@ def update_node_db_status(update_list, connection):
     try:
         cslog("Updating node status.")
         cursor = connection.cursor()
-        cursor.execute("USE nova")
+        cursor.execute("USE " + str(connection.database))
         for item in update_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)
@@ -116,17 +116,17 @@ if __name__ == "__main__":
     try:
         ipaddress.ip_address(str(input_arg.NODE_IP))
     except:
-        input_arg.NODE_IP = "192.168.1.255";
+        input_arg.NODE_IP = "192.168.1.255"
     try:
         if input_arg.NODE_PORT < 0 or input_arg.NODE_PORT > 65535: raise Exception("Invalid Port")
     except:
-        cslog("Invalid IP, using Default: 9996");
+        cslog("Invalid IP, using Default: 9996")
         input_arg.NODE_PORT = 9996
     try:
         if input_arg.HOST_IP != None: ipaddress.ip_address(str(input_arg.HOST_IP))
     except:
-        parser.print_usage();
-        sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP));
+        parser.print_usage()
+        sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP))
 
     cmd = []
     cslog("Started UDP Command Handler")
@@ -160,7 +160,7 @@ if __name__ == "__main__":
                 mysql_cred = yaml.safe_load(stream)["mysql_cred"]
             except yaml.YAMLError as exc:
                 cslog(exc)
-        cslog("Connecting to database nova.")
+        cslog("Connecting to database " + str(mysql_cred["DATABASE"]) + ".")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         update_node_db_status(update_list, connection)
         cslog("Closing DB connection")

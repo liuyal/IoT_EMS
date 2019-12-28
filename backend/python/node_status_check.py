@@ -22,7 +22,7 @@ def cslog(msg, flag="info"):
 def check_node_status(connection, timeout):
     cslog("Checking node status.")
     cursor = connection.cursor()
-    cursor.execute("USE nova")
+    cursor.execute("USE " + str(connection.database))
     cursor.execute("SELECT mac, time_stamp, status FROM nodes;")
     result = cursor.fetchall()
     if len(result) < 1:
@@ -83,7 +83,7 @@ if __name__ == "__main__":
             except yaml.YAMLError as exc:
                 cslog(exc)
 
-        cslog("Connecting to database nova.")
+        cslog("Connecting to database " + str(mysql_cred["DATABASE"]) + ".")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         check_node_status(connection, input_arg.timeout * 60)
         cslog("Closing DB connection")
