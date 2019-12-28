@@ -19,15 +19,15 @@ def cslog(msg, flag="info"):
 
 
 def check_daily_avg(connection):
-    cslog("Checking daily_avg table.")
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database))
-    cursor.execute("SELECT mac, date FROM daily_avg;")
-    result = cursor.fetchall()
-    if len(result) < 1:
-        return []
-    else:
+    cslog("Checking daily_avg table.")
+    try:
+        cursor.execute("SELECT mac, date FROM daily_avg;")
+        result = cursor.fetchall()
         return result
+    except Exception as e:
+        cslog("Failure: " + str(e))
 
 
 def check_nova(connection):
@@ -42,13 +42,19 @@ def check_nova(connection):
             cursor.execute("SELECT DISTINCT mac FROM " + item[0] + " ORDER BY mac ASC;")
             macs = cursor.fetchall()
             for mac in macs:
-                mac_list.append((mac[0], item[0]))
+                mac_list.append((mac[0], item[0].split("_")[0]))
     return mac_list
 
 
 def calc_avg(avg_list, mac_list, connection):
-    cmd = "CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));"
+    cursor = connection.cursor()
+    cursor.execute("USE " + str(connection.database))
+    for pop in avg_list:
+        for item in mac_list:
+            if str(item[0]) == str(pop[0]) and str(item[1]) == str(pop[1]):
+                mac_list.remove(item)
 
+    print()
 
 
 if __name__ == "__main__":
