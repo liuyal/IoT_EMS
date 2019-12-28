@@ -32,7 +32,6 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
 
 
 if __name__ == "__main__":
-
     cmd = [b"[ping]"]
 
     msg_queue = queue.Queue()
@@ -44,11 +43,3 @@ if __name__ == "__main__":
 
     # thread_send.join()
     thread_listen.join()
-
-
-
-
-
-
-
-

@@ -6,8 +6,10 @@ from mysql.connector import errorcode
 
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose and flag == "info": print(msg)
-    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
+    if input_arg.verbose and flag == "info":
+        print(msg)
+    elif input_arg.verbose and flag == "error":
+        print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
@@ -53,7 +55,7 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
             data, address = sock.recvfrom(1024)
             mac = re.findall(p, str(data))
             if len(mac) != 0:
-                packet = {"ip" : address[0], "port" : address[1], "mac" : mac[0], "data" : data, "time": int(time.time())}
+                packet = {"ip": address[0], "port": address[1], "mac": mac[0], "data": data, "time": int(time.time())}
                 data_list.append(packet)
                 mac_list.append(mac[0])
             cslog("Packet: " + str(address) + "\t" + str(data))
@@ -74,7 +76,7 @@ def update_node_db_status(update_list, connection):
             cursor.execute(search_cmd)
             result = cursor.fetchall()
             if len(result) < 1:
-                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('" +  str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE)"
+                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status, display) VALUES('" + str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE, FALSE)"
                 cursor.execute(add_node)
                 connection.commit()
             else:
@@ -90,7 +92,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-f", "--fetch", action='store_true', help='Pull data from Node(s) and send to host')
     parser.add_argument("-P", "--ping", action='store_true', help='Ping Node(s)')
-    parser.add_argument("-r", "--reboot",action='store_true', help='Reboot Node(s)')
+    parser.add_argument("-r", "--reboot", action='store_true', help='Reboot Node(s)')
     parser.add_argument("-s", "--set", action='store', type=str, dest="HOST_IP", help='Set Node(s) host IP (where nodes will send data to)')
     parser.add_argument("-ip", action='store', type=str, dest="NODE_IP", default="192.168.1.255", help='Send command to specified Node(s) IPV4 Address (Default: Broadcast IP)')
     parser.add_argument("-p", action='store', type=int, dest="NODE_PORT", default=9996, help='Send command to specified Node(s) UDP listening port (Default: 9996)')
@@ -101,20 +103,30 @@ if __name__ == "__main__":
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
     input_arg = parser.parse_args()
-    try: sys.argv[1]
-    except: parser.print_help(); sys.exit()
+    try:
+        sys.argv[1]
+    except:
+        parser.print_help()
+        sys.exit()
+
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
     if input_arg.update and input_arg.PORT < 1: cslog("-L flag must be set for updating database. -h for help", "error")
 
-    try: ipaddress.ip_address(str(input_arg.NODE_IP))
-    except: input_arg.NODE_IP = "192.168.1.255";
+    try:
+        ipaddress.ip_address(str(input_arg.NODE_IP))
+    except:
+        input_arg.NODE_IP = "192.168.1.255";
     try:
         if input_arg.NODE_PORT < 0 or input_arg.NODE_PORT > 65535: raise Exception("Invalid Port")
-    except: cslog("Invalid IP, using Default: 9996"); input_arg.NODE_PORT = 9996
+    except:
+        cslog("Invalid IP, using Default: 9996");
+        input_arg.NODE_PORT = 9996
     try:
         if input_arg.HOST_IP != None: ipaddress.ip_address(str(input_arg.HOST_IP))
-    except: parser.print_usage(); sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP));
+    except:
+        parser.print_usage();
+        sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP));
 
     cmd = []
     cslog("Started UDP Command Handler")
@@ -123,11 +135,13 @@ if __name__ == "__main__":
     if input_arg.reboot: cmd.append(b"[reboot]\n")
     if input_arg.HOST_IP != None: cmd.append(("[set_ip|" + str(input_arg.HOST_IP) + "]\n").encode('utf8'))
     if len(cmd) == 0: parser.print_help(); cslog("No command parameters set, default to [Ping]"); input_arg.ping = True; cmd.append(b"[ping]\n")
-    if input_arg.verbose: cslog("Input: " + str(input_arg).replace("Namespace",""))
+    if input_arg.verbose: cslog("Input: " + str(input_arg).replace("Namespace", ""))
 
     msg_queue = queue.Queue()
-    if input_arg.NODE_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
-    else: thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
+    if input_arg.NODE_IP.split('.')[-1] == "255":
+        thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
+    else:
+        thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
     if input_arg.PORT > 0: thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.PORT, input_arg.t))
     thread_send.start()
     if input_arg.PORT > 0: thread_listen.start()
@@ -142,8 +156,10 @@ if __name__ == "__main__":
             for item in reversed(msg):
                 if mac == item["mac"]: update_list.append(item); msg.pop(-1); break
         with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: cslog(exc)
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                cslog(exc)
         cslog("Connecting to database nova.")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         update_node_db_status(update_list, connection)
@@ -152,10 +168,3 @@ if __name__ == "__main__":
 
     logging.shutdown()
     cslog("UDP Command Handler Complete.")
-
-
-
-
-
-
-

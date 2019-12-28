@@ -39,53 +39,6 @@ def request_test(ip):
     print(data)
 
 
-def time_check(ip):
-    show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
-    read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
-    response = requests.get(show_tables)
-    table_resp = response.json()["data"]
-    tables = []
-    for item in table_resp: tables.append(item['table'])
-    for date in tables:
-        if date != "nodes" and date != "system_config":
-            response = requests.get(read_table + date)
-            resp = response.json()["data"]
-            print(date)
-            for item in resp:
-                epoch_time = item["time"]
-                times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
-                print("\t" + str(times))
-
-
-def random_data_generator(ip, n=10):
-    for i in range(0, n):
-        random.seed(i)
-        mac = rand_mac()
-        epoch = random.randint(1576800000, 1577232000)
-        temp = round(random.uniform(-10, 50), 2)
-        hum = round(random.uniform(0, 100), 2)
-        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-        response = requests.get(insert_req)
-        print(time.strftime('%Y%m%d %h:%m:%s', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
-
-
-def add_nodes(mac):
-    try:
-        with open("../server_info.yaml", 'r') as stream:
-            try:
-                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc:
-                print(exc)
-        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        cursor = connection.cursor()
-        cursor.execute("USE nova")
-        for item in mac:
-            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, FALSE)")
-            connection.commit()
-    except mysql.connector.Error as error:
-        print("Failed access table {}".format(error))
-
-
 def db_validate(ip):
     show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
     read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
@@ -156,6 +109,58 @@ def db_validate(ip):
         print(str(cmd_item) + "\nFailed access table {}".format(error))
 
 
+def time_check(ip):
+    show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
+    read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
+    response = requests.get(show_tables)
+    table_resp = response.json()["data"]
+    tables = []
+    for item in table_resp: tables.append(item['table'])
+    for date in tables:
+        if date != "nodes" and date != "system_config" and date != "daily_avg":
+            response = requests.get(read_table + date)
+            resp = response.json()["data"]
+            print(date)
+            for item in resp:
+                epoch_time = item["time"]
+                times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
+                print("\t" + str(times))
+
+
+def add_nodes(mac):
+    try:
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        cursor = connection.cursor()
+        cursor.execute("USE nova")
+        for item in mac:
+            print("Adding node: " + str(item))
+            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, FALSE, FALSE)")
+            connection.commit()
+    except mysql.connector.Error as error:
+        print("Failed access table {}".format(error))
+
+
+def random_data_generator(mac_list, ip, start_date, end_date, n=50):
+    epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    for i in range(0, n):
+        # random.seed(i)
+        # mac = rand_mac()
+        index = random.randint(0, len(mac_list) - 1)
+        mac = mac_list[index]
+        epoch = random.randint(epoch_start, epoch_end)
+        temp = round(random.uniform(-10, 50), 2)
+        hum = round(random.uniform(0, 100), 2)
+        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        response = requests.get(insert_req)
+        sys.stdout.write("[" + str(i) + "]" + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
+
+
 def data_generator(ip, mac, start, end):
     epoch = int(start)
     while epoch < int(end):
@@ -191,10 +196,11 @@ def generator_wrapper(ip, mac, start_date, end_date, threads):
 
 
 if __name__ == "__main__":
-
     ip = "localhost"
-    generator_wrapper(ip="localhost", mac="1c:2e:2b:b8:56:9d", start_date=20191227, end_date=20191228, threads=40)
-    # random_data_generator(ip, 20)
-    # add_nodes(["BC:DD:C2:2F:47:79", "5C:CF:7F:AC:72:78"])
-    # time_check(ip)
+    mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
+
+    # generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191225, end_date=20191228, threads=40)
+    # add_nodes(mac_list)
+    # random_data_generator(mac_list, ip, start_date=20191220, end_date=20191227, n=500)
+    time_check(ip)
     # db_validate(ip)

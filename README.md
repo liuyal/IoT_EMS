@@ -3,7 +3,7 @@
 
 ## Server
 
-
+- [Charts](https://www.chartjs.org/)
 
 ## Nodes
 
@@ -46,7 +46,7 @@ netstat -tlpn | grep mysql
 sudo -H pip3 --default-timeout=1000 install --upgrade pip
 
 --SQL--
-mysqldump --databases nova > dump.sql
+mysqldump -u root --databases nova > dump.sql
 
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';

@@ -12,9 +12,7 @@
         $db = mysqli_select_db($connect, DB_DATABASE);
         $response["message"][0] = "Server Connected successfully";
     }
-    catch(PDOException $e){
-        $response["message"][0] = "Server Connection failed: " . $e->getMessage();
-    }
+    catch(PDOException $e){$response["message"][0] = "Server Connection failed: " . $e->getMessage();}
 
     $result = mysqli_query($connect, "show tables;");
      

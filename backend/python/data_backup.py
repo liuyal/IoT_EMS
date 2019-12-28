@@ -6,8 +6,10 @@ from mysql.connector import errorcode
 
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose and flag == "info": print(msg)
-    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
+    if input_arg.verbose and flag == "info":
+        print(msg)
+    elif input_arg.verbose and flag == "error":
+        print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
@@ -17,6 +19,7 @@ def cslog(msg, flag="info"):
 
 
 def db_backup(connection):
+    date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
     cursor = connection.cursor()
     cursor.execute("USE nova")
     cursor.execute("SHOW TABLES;")
@@ -54,6 +57,7 @@ def db_backup(connection):
             connection.commit()
             cmd_counter += 1
     if cmd_counter == 0: cslog("No data to be backed up.")
+    cslog("Backed up " + str(cmd_counter) + " data points")
 
 
 if __name__ == "__main__":
@@ -64,18 +68,20 @@ if __name__ == "__main__":
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
     input_arg = parser.parse_args()
-    try: sys.argv[1]
-    except: parser.print_help()
+    try:
+        sys.argv[1]
+    except:
+        parser.print_help()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
     cslog("Back Up Started...")
 
-    date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
-
     try:
         with open("server_info.yaml", 'r') as stream:
-            try: mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc: cslog(exc)
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                cslog(exc)
 
         cslog("Connecting to database nova.")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
@@ -88,6 +94,3 @@ if __name__ == "__main__":
         cslog("Back Up Complete.")
     except mysql.connector.Error as error:
         cslog("Failed {}".format(error), flag="error")
-
-
-

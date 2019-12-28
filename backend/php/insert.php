@@ -25,7 +25,7 @@
         $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac='$mac';");
 
         if ($find_mac->num_rows == 0){
-            $result2 = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, '$time', true)");
+            $result2 = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status, display) VALUES('$mac', '0.0.0.0', 0, '$time', true, false)");
         }
         else{
             $result2 = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");

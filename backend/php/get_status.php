@@ -17,6 +17,8 @@
         $response["message"][0] = "Server Connection failed: " . $e->getMessage();
     }
 
+    // TODO: get current, last hour, day, week, month, year
+
     $n_online = mysqli_query($connect, "SELECT COUNT(*) as count FROM nodes WHERE status=true;");
     $temp_hum = mysqli_query($connect, "SELECT * FROM data ORDER BY time DESC LIMIT 1;");
 

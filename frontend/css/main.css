@@ -16,12 +16,16 @@
 
 .main-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin: 0px 0px 0px 0px;
     padding: 7px;
     height: 49px;
     color: slategray;
     border-bottom: 1px solid #202020;
+}
+
+.main-header button{
+    margin-right: 10px;
 }
 
 /* ---------------------------------------------------

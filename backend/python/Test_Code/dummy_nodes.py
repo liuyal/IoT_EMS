@@ -74,21 +74,24 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-n', action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
-    try: sys.argv[1]
-    except: parser.print_help();
+    try:
+        sys.argv[1]
+    except:
+        parser.print_help();
 
-    n_nodes = int(input_arg.nodes)
     data = ""
+    mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
+    n_nodes = int(input_arg.nodes)
     condition = threading.Condition()
     thread_list = []
-
     listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", 9996, 6000))
     thread_list.append(listener)
 
-    print("Starting " + str(n_nodes) + " Dummy Nodes...")
+    print("\nStarting " + str(n_nodes) + " Dummy Nodes...")
     for i in range(1, n_nodes + 1):
-        random.seed(i)
-        node_mac = rand_mac()
+        # random.seed(i)
+        # node_mac = rand_mac()
+        node_mac = mac_list[i - 1]
         node_ip = "192.168.1." + str(i)
         dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, "192.168.1.80", 9996))
         thread_list.append(dummy_node_thread)

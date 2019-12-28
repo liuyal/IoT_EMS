@@ -49,6 +49,7 @@
             $data["port"] = $row["port"];
             $data["time_stamp"] = $row["time_stamp"];
             $data["status"] = $row["status"];
+            $data["display"] = $row["display"];
             array_push($response["data"], $data);
         }
         $response["success"] = 1;

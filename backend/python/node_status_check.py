@@ -3,11 +3,14 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 
+
 # https://stackoverflow.com/questions/287871/how-to-print-colored-text-in-terminal-in-python
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose and flag == "info": print(msg)
-    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
+    if input_arg.verbose and flag == "info":
+        print(msg)
+    elif input_arg.verbose and flag == "error":
+        print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
@@ -22,28 +25,39 @@ def check_node_status(connection, timeout):
     cursor.execute("USE nova")
     cursor.execute("SELECT mac, time_stamp, status FROM nodes;")
     result = cursor.fetchall()
-    if len(result) < 1: cslog("No Nodes found")
+    if len(result) < 1:
+        cslog("No Nodes found")
     else:
         for item in result:
             current_time = int(time.time())
             last_node_time = item[1]
             delta_seconds = current_time - last_node_time
             if delta_seconds > timeout:
-                if int(delta_seconds) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
-                elif int(delta_seconds / 60) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds))+ " minute"
-                elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
-                elif int(delta_seconds / (60 * 60)) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
-                else: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
+                if int(delta_seconds) < 60:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
+                elif int(delta_seconds / 60) == 1:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
+                elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
+                elif int(delta_seconds / (60 * 60)) == 1:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
+                else:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
                 cslog("Node: " + item[0] + " last seen " + time_info + " ago. Updating status to offline.")
                 update_status_sql = "UPDATE nodes SET status=false WHERE mac='" + item[0] + "';"
                 cursor.execute(update_status_sql)
                 connection.commit()
             else:
-                if int(delta_seconds) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
-                elif int(delta_seconds / 60) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds))+ " minute"
-                elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
-                elif int(delta_seconds / (60 * 60)) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
-                else: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
+                if int(delta_seconds) < 60:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
+                elif int(delta_seconds / 60) == 1:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
+                elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
+                elif int(delta_seconds / (60 * 60)) == 1:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
+                else:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
                 cslog("Node: " + item[0] + " last seen " + time_info + " ago.")
 
 
@@ -55,8 +69,10 @@ if __name__ == "__main__":
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
     input_arg = parser.parse_args()
-    try: sys.argv[1]
-    except: parser.print_help(); sys.exit()
+    try:
+        sys.argv[1]
+    except:
+        parser.print_help()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
 
