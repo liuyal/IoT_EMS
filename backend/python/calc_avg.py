@@ -18,19 +18,51 @@ def cslog(msg, flag="info"):
         if flag == "debug": logging.debug(msg)
 
 
-if __name__ == "__main__":
+def check_daily_avg(connection):
+    cslog("Checking daily_avg table.")
+    cursor = connection.cursor()
+    cursor.execute("USE " + str(connection.database))
+    cursor.execute("SELECT mac, date FROM daily_avg;")
+    result = cursor.fetchall()
+    if len(result) < 1:
+        return []
+    else:
+        return result
 
+
+def check_nova(connection):
+    cslog("Checking tables in nova.")
+    cursor = connection.cursor()
+    cursor.execute("USE " + str(connection.database))
+    cursor.execute("SHOW TABLES;")
+    result = cursor.fetchall()
+    mac_list = []
+    for item in result:
+        if item[0] != "data" and item[0] != "daily_avg" and item[0] != "nodes" and item[0] != "system_config":
+            cursor.execute("SELECT DISTINCT mac FROM " + item[0] + " ORDER BY mac ASC;")
+            macs = cursor.fetchall()
+            for mac in macs:
+                mac_list.append((mac[0], item[0]))
+    return mac_list
+
+
+def calc_avg(avg_list, mac_list, connection):
     cmd = "CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));"
+
+
+
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
-
     input_arg = parser.parse_args()
     try:
         sys.argv[1]
     except:
         parser.print_help()
+
+    cslog("Calculating Daily Averages.")
 
     try:
         with open("server_info.yaml", 'r') as stream:
@@ -42,7 +74,9 @@ if __name__ == "__main__":
         cslog("Connecting to database " + str(mysql_cred["DATABASE"]) + ".")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
 
-
+        avg_list = check_daily_avg(connection)
+        mac_list = check_nova(connection)
+        calc_avg(avg_list, mac_list, connection)
 
         cslog("Closing DB connection")
         connection.close()

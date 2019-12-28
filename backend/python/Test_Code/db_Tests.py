@@ -54,8 +54,10 @@ def db_validate(ip):
         main_table.append(item["table"])
         wrong_data[item["table"]] = []
     tables.remove("nodes")
+    tables.remove("daily_avg")
     tables.remove("system_config")
     main_table.remove("nodes")
+    main_table.remove("daily_avg")
     main_table.remove("system_config")
     del wrong_data["nodes"], wrong_data["system_config"]
     for item in tables:
