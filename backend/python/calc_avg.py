@@ -20,7 +20,7 @@ def cslog(msg, flag="info"):
 
 def check_daily_avg(connection):
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     cslog("Checking daily_avg table.")
     try:
         cursor.execute("SHOW TABLES;")
@@ -41,7 +41,7 @@ def check_daily_avg(connection):
 def check_nova(connection):
     cslog("Checking tables in nova.")
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     cursor.execute("SHOW TABLES;")
     result = cursor.fetchall()
     mac_list = []
@@ -57,7 +57,7 @@ def check_nova(connection):
 def calc_avg(avg_list, mac_list, connection):
     cslog("Calculating daily averages")
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     if avg_list == None:
         avg_list = []
     for pop in avg_list:

@@ -70,7 +70,7 @@ def update_node_db_status(update_list, connection):
     try:
         cslog("Updating node status.")
         cursor = connection.cursor()
-        cursor.execute("USE " + str(connection.database))
+        cursor.execute("USE " + str(connection.database) + ";")
         for item in update_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)

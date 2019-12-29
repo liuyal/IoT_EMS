@@ -80,11 +80,41 @@ def db_validate(ip):
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE " + mysql_cred["DATABASE"])
+        cursor.execute("USE " + str(connection.database) + ";")
         for cmd_item in remove_cmd: cursor.execute(cmd_item)
         for cmd_item in add_cmd: cursor.execute(cmd_item)
     except mysql.connector.Error as error:
         print(str(cmd_item) + "\nFailed access table {}".format(error))
+
+
+def db_reset():
+    try:
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        cursor = connection.cursor()
+        print("Resetting Database: " +  str(mysql_cred["DATABASE"]))
+        try:
+            cursor.execute("USE " + str(mysql_cred["DATABASE"]) + ";")
+            cursor.execute("DROP DATABASE " + str(mysql_cred["DATABASE"]) + ";")
+        except:
+            print("Database " + str(mysql_cred["DATABASE"]) + " cannot be accessed or does not exist.")
+
+        cursor.execute("CREATE DATABASE " + str(mysql_cred["DATABASE"]) + ";")
+        cursor.execute("USE " + str(mysql_cred["DATABASE"]) + ";")
+
+        cursor.execute("CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
+        cursor.execute("CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
+        cursor.execute("CREATE Table system_config(host_ip CHAR(39), host_port INT);")
+        cursor.execute("CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
+        connection.commit()
+        print("Reset Complete")
+    except mysql.connector.Error as error:
+        print("Failed access table {}".format(error))
+
 
 
 def time_check(ip):
@@ -121,7 +151,7 @@ def time_check_sql():
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE " + str(connection.database))
+        cursor.execute("USE " + str(connection.database) + ";")
 
         cursor.execute("SHOW TABLES;")
         tables = []
@@ -156,7 +186,7 @@ def add_nodes(mac):
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
-        cursor.execute("USE " + str(connection.database))
+        cursor.execute("USE " + str(connection.database) + ";")
         for item in mac:
             print("Adding node: " + str(item))
             cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, false, false)")
@@ -308,7 +338,7 @@ if __name__ == "__main__":
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
+    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
     # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=3000)
     # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
     # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191230, n=500)
@@ -316,4 +346,5 @@ if __name__ == "__main__":
     # sql_connector_test()
     # time_check(ip)
     # time_check_sql()
+    db_reset()
     # db_validate(ip)

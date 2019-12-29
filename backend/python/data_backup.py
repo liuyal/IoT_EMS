@@ -20,7 +20,7 @@ def cslog(msg, flag="info"):
 
 def thread(thread_id, connection, list, start, end):
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     for i in range(start, end + 1):
         # sys.stdout.write(str(thread_id) + " [" + str(i) + "] " + list[i] + "\n")
         cursor.execute(list[i])
@@ -71,7 +71,7 @@ def back_up(insert_list, remove_list, n_threads):
 def sql_cmd_maker(connection):
     date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     cursor.execute("SHOW TABLES;")
     tables = cursor.fetchall()
 

@@ -22,7 +22,7 @@ def cslog(msg, flag="info"):
 def check_node_status(connection, timeout):
     cslog("Checking node status.")
     cursor = connection.cursor()
-    cursor.execute("USE " + str(connection.database))
+    cursor.execute("USE " + str(connection.database) + ";")
     cursor.execute("SELECT mac, time_stamp, status FROM nodes;")
     result = cursor.fetchall()
     if len(result) < 1:
