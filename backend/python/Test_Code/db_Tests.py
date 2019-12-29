@@ -126,8 +126,7 @@ def db_reset():
         print("Failed access table {}".format(error))
 
 
-
-def time_check(ip):
+def time_check_http(ip):
     show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
     read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
     response = requests.get(show_tables)
@@ -162,13 +161,11 @@ def time_check_sql():
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         cursor.execute("USE " + str(connection.database) + ";")
-
         cursor.execute("SHOW TABLES;")
         tables = []
         for item in cursor.fetchall():
             if item[0] != "nodes" and item[0] != "daily_avg" and item[0] != "system_config":
                 tables.append(item[0])
-
         for date in tables:
             try:
                 cursor.execute("SELECT time FROM " + date + " ORDER BY time ASC;")
@@ -182,7 +179,6 @@ def time_check_sql():
                     counter += 1
             except Exception as error:
                 print(error)
-
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
 
@@ -346,16 +342,25 @@ def sql_generator_wrapper(mac, start_date, end_date, threads):
 
 if __name__ == "__main__":
 
+    start_date = 20191120
+    end_date = 20191125
+    n_threads = 200
+
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
+
     # db_reset()
-    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
-    # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=5)
-    # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
-    # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191230, n=500)
+
+    # sql_generator_wrapper("00:00:00:00:00:01", start_date, end_date, n_threads)
+    # sql_random_data_generator(mac_list, start_date, end_date, 1000)
+
+    # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, end_date, n_threads)
+    # http_random_data_generator(mac_list, ip, start_date, end_date, 300)
+
     # add_nodes(mac_list)
-    # sql_connector_test()
-    # time_check(ip)
+
+    # time_check_http(ip)
     # time_check_sql()
+
     # db_validate(ip)
