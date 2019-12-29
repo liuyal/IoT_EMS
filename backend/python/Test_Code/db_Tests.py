@@ -1,4 +1,4 @@
-import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading, cProfile
+import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading, cProfile, math
 from datetime import date, timedelta, timezone
 import mysql.connector
 from mysql.connector import Error
@@ -13,30 +13,6 @@ def rand_mac():
     e = random.randint(0, 255)
     f = random.randint(0, 255)
     return "%02x:%02x:%02x:%02x:%02x:%02x" % (a, b, c, d, e, f)
-
-
-def sql_connector_test():
-    try:
-        with open("../server_info.yaml", 'r') as stream:
-            try:
-                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
-            except yaml.YAMLError as exc:
-                print(exc)
-        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        cursor = connection.cursor()
-        cursor.execute("USE " + str(connection.database))
-        cursor.execute("SHOW TABLES")
-        tables = cursor.fetchall()
-        print(tables)
-    except mysql.connector.Error as error:
-        print("Failed access table {}".format(error))
-
-
-def request_test(ip):
-    req = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
-    response = requests.get(req)
-    data = response.json()["data"]
-    print(data)
 
 
 def db_validate(ip):
@@ -122,14 +98,53 @@ def time_check(ip):
         try:
             if date != "nodes" and date != "system_config" and date != "daily_avg":
                 response = requests.get(read_table + date)
-                resp = response.json()["data"]
-                print(date)
-                for item in resp:
-                    epoch_time = item["time"]
-                    times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
-                    print("\t" + str(times))
+                try:
+                    resp = response.json()["data"]
+                    print(date)
+                    for item in resp:
+                        epoch_time = item["time"]
+                        times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
+                        print("\t" + str(times))
+                except:
+                    resp = response.json()["message"]
+                    print(resp[0] + "\n" + resp[1])
         except Exception as error:
             print(error)
+
+
+def time_check_sql():
+    try:
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        cursor = connection.cursor()
+        cursor.execute("USE " + str(connection.database))
+
+        cursor.execute("SHOW TABLES;")
+        tables = []
+        for item in cursor.fetchall():
+            if item[0] != "nodes" and item[0] != "daily_avg" and item[0] != "system_config":
+                tables.append(item[0])
+
+        for date in tables:
+            try:
+                cursor.execute("SELECT time FROM " + date + " ORDER BY time ASC;")
+                data = cursor.fetchall()
+                print(date)
+                counter = 1
+                for item in data:
+                    epoch_time = item[0]
+                    times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
+                    print("\t[" + str(counter) + "] " + str(times))
+                    counter += 1
+            except Exception as error:
+                print(error)
+
+    except mysql.connector.Error as error:
+        print("Failed access table {}".format(error))
 
 
 def add_nodes(mac):
@@ -181,18 +196,28 @@ def http_generator_wrapper(ip, mac, start_date, end_date, threads):
     epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     Delta = int(epoch_end - epoch_start)
     n_requests = int(Delta / 60)
-    req_per_threads = int(n_requests / threads)
+    req_per_threads = int(math.ceil(n_requests / threads))
+
     print("Start:\t" + str(epoch_start))
     print("End:\t" + str(epoch_end))
     print("Delta:\t" + str(Delta))
     print("n_req:\t" + str(n_requests))
+    print("n_t:\t" + str(threads))
     print("req/t:\t" + str(req_per_threads))
+
     list = []
     thread_list = []
     for i in range(0, threads):
         list.append(epoch_start)
         epoch_start = epoch_start + req_per_threads * 60
     list.append(list[-1] + req_per_threads * 60)
+
+    counter = len(list) - 1
+    for index in reversed(list):
+        if index > epoch_end:
+            list.pop(counter)
+            counter -= 1
+
     for i in range(0, threads):
         gen_thread = threading.Thread(target=http_data_generator, args=(ip, mac, list[i], list[i + 1]))
         thread_list.append(gen_thread)
@@ -200,7 +225,8 @@ def http_generator_wrapper(ip, mac, start_date, end_date, threads):
     for item in thread_list: item.join()
     print("")
 
-def sql_data_generator(connection, mac, start, end):
+
+def sql_data_generator(thread_id, connection, mac, start, end):
     epoch = int(start)
     cursor = connection.cursor()
     while epoch < int(end):
@@ -209,7 +235,7 @@ def sql_data_generator(connection, mac, start, end):
         insert_sql_cmd = "INSERT INTO data(mac, time, temp, hum) VALUES('" + mac + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ")"
         cursor.execute(insert_sql_cmd)
         connection.commit()
-        sys.stdout.write(time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_sql_cmd + "\n")
+        sys.stdout.write("[" + str(thread_id) + "] " + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + " | " + insert_sql_cmd + "\n")
         epoch = epoch + 60
 
 
@@ -218,40 +244,51 @@ def sql_generator_wrapper(mac, start_date, end_date, threads):
     epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     Delta = int(epoch_end - epoch_start)
     n_requests = int(Delta / 60)
-    req_per_threads = int(n_requests / threads)
+    req_per_threads = int(math.ceil(n_requests / threads))
+
     print("Start:\t" + str(epoch_start))
     print("End:\t" + str(epoch_end))
     print("Delta:\t" + str(Delta))
     print("n_req:\t" + str(n_requests))
+    print("n_t:\t" + str(threads))
     print("req/t:\t" + str(req_per_threads))
+
     list = []
     thread_list = []
     for i in range(0, threads):
         list.append(epoch_start)
         epoch_start = epoch_start + req_per_threads * 60
     list.append(list[-1] + req_per_threads * 60)
-    for i in range(0, threads):
+
+    counter = len(list) - 1
+    for index in reversed(list):
+        if index > epoch_end:
+            list.pop(counter)
+            counter -= 1
+
+    for i in range(0, counter):
         with open("../server_info.yaml", 'r') as stream:
             try:
                 mysql_cred = yaml.safe_load(stream)["mysql_cred"]
             except yaml.YAMLError as exc:
                 print(exc)
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        gen_thread = threading.Thread(target=sql_data_generator, args=(connection, mac, list[i], list[i + 1]))
+        gen_thread = threading.Thread(target=sql_data_generator, args=(i, connection, mac, list[i], list[i + 1]))
         thread_list.append(gen_thread)
+
     for item in thread_list: item.start()
     for item in thread_list: item.join()
     print("")
+
 
 if __name__ == "__main__":
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
+    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191228, end_date=20191230, threads=200)
     # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
-    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191228, threads=100)
-
     # add_nodes(mac_list)
-    # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191227, n=500)
     # sql_connector_test()
     # time_check(ip)
+    time_check_sql()
     # db_validate(ip)

@@ -29,21 +29,18 @@
 
 ### CODE & CMD
 ```
---TIME--
-TIMESTAMP = date +%Y%m%d
-YESTERDAY_STAMP = date --date="1 day ago" +%Y%m%d
-timedatectl set-ntp false
-sudo ntpdate 1.ro.pool.ntp.org
-date +%Y%m%d -s "20191217"
-date +%T -s "23:59:50"
-
 --CRON--
 * * * * * sudo python3 /var/www/html/Temperature_System/backend/python/udp_cmd.py -f -u -l
 @midnight sudo python3 /var/www/html/Temperature_System/backend/python/data_backup.py -v -l
 
 --BASH--
 netstat -tlpn | grep mysql
-sudo -H pip3 --default-timeout=1000 install --upgrade pip
+timedatectl set-ntp false
+sudo ntpdate 1.ro.pool.ntp.org
+TIMESTAMP = date +%Y%m%d
+YESTERDAY_STAMP = date --date="1 day ago" +%Y%m%d
+date +%Y%m%d -s "20191217"
+date +%T -s "23:59:50"
 
 --SQL--
 mysqldump -u root --databases nova > dump.sql
@@ -52,9 +49,8 @@ CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';
 ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
 
-CREATE USER 'zeus'@'192.168.1.80' IDENTIFIED BY 'Airlink_1';
-GRANT ALL PRIVILEGES ON *.* TO 'zeus'@'192.168.1.80';
-ALTER USER 'zeus'@'192.168.1.80' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  
+SHOW VARIABLES LIKE "max_connections";
+SET GLOBAL max_connections = 500;
 
 SELECT * FROM data ORDER BY time DESC LIMIT 1;
 SELECT COUNT(*) FROM nodes WHERE status=true;

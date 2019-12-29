@@ -1,4 +1,4 @@
-import os, sys, time, logging, platform, argparse, yaml
+import os, sys, time, logging, platform, argparse, yaml, threading, math
 from datetime import date, timedelta, datetime
 import mysql.connector
 from mysql.connector import Error
@@ -18,7 +18,57 @@ def cslog(msg, flag="info"):
         if flag == "debug": logging.debug(msg)
 
 
-def db_backup(connection):
+def thread(thread_id, connection, list, start, end):
+    cursor = connection.cursor()
+    cursor.execute("USE " + str(connection.database))
+    for i in range(start, end + 1):
+        # sys.stdout.write(str(thread_id) + " [" + str(i) + "] " + list[i] + "\n")
+        cursor.execute(list[i])
+        connection.commit()
+    connection.close()
+
+
+def back_up(insert_list, remove_list, n_threads):
+    insert_len = len(insert_list)
+    remove_len = len(remove_list)
+    insert_cmd_per_thread = int(math.floor(insert_len / n_threads))
+    remove_cmd_per_thread = int(math.floor(remove_len / n_threads))
+    insert_end = insert_len - 1
+    remove_end = remove_len - 1
+    thread_list = []
+    with open("./server_info.yaml", 'r') as stream:
+        try:
+            mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+        except yaml.YAMLError as exc:
+            cslog(exc)
+    for i in range(0, n_threads):
+        conn1 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        conn2 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        insert_start = int(i * insert_cmd_per_thread)
+        insert_end = int(insert_cmd_per_thread * (i + 1) - 1)
+        remove_start = int(i * remove_cmd_per_thread)
+        remove_end = int(remove_cmd_per_thread * (i + 1) - 1)
+
+        insert_thread = threading.Thread(target=thread, args=(i, conn1, insert_list, insert_start, insert_end))
+        remove_thread = threading.Thread(target=thread, args=(i, conn2, remove_list, remove_start, remove_end))
+        thread_list.append(insert_thread)
+        thread_list.append(remove_thread)
+
+    if insert_end != insert_len - 1:
+        conn_end1 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        insert_thread = threading.Thread(target=thread, args=(i + 1, conn_end1, insert_list, insert_end, insert_len - 1))
+        thread_list.append(insert_thread)
+
+    if remove_end != remove_len - 1:
+        conn_end2 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        remove_thread = threading.Thread(target=thread, args=(i + 1, conn_end2, remove_list, remove_end, remove_len - 1))
+        thread_list.append(remove_thread)
+
+    for item in thread_list: item.start()
+    for item in thread_list: item.join()
+
+
+def sql_cmd_maker(connection):
     date_stamp = datetime.utcnow().date().strftime('%Y%m%d')
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database))
@@ -30,7 +80,7 @@ def db_backup(connection):
         cslog("data Table does not exist, creating data Table, EXIT.", flag="error")
         sys.exit()
 
-    cursor.execute("SELECT mac, time, temp, hum from data;")
+    cursor.execute("SELECT mac, time, temp, hum FROM  data ORDER BY time ASC;")
     time_list = cursor.fetchall()
 
     if len(time_list) < 1:
@@ -38,6 +88,8 @@ def db_backup(connection):
         sys.exit()
 
     cmd_counter = 0
+    insert_list = []
+    remove_list = []
     cslog("Validating time, checking dates.")
     for item in time_list:
         data_date = time.strftime('%Y%m%d', time.gmtime(int(item[1])))
@@ -52,21 +104,24 @@ def db_backup(connection):
                 cursor.execute(create_cmd)
             insert_cmd = "INSERT INTO " + table_name + "(mac,time,temp,hum) VALUES('" + str(item[0]) + "'," + str(item[1]) + "," + str(item[2]) + "," + str(item[3]) + ");"
             remove_cmd = "DELETE FROM data WHERE mac='" + str(item[0]) + "' AND time=" + str(item[1]) + ";"
-            cursor.execute(insert_cmd)
-            cursor.execute(remove_cmd)
-            connection.commit()
+            insert_list.append(insert_cmd)
+            remove_list.append(remove_cmd)
             cmd_counter += 1
-    if cmd_counter == 0: cslog("No data to be backed up.")
-    cslog("Backed up " + str(cmd_counter) + " data points")
+    connection.close()
+    if cmd_counter == 0:
+        cslog("No data to be backed up.")
+    else:
+        cslog("Backing up " + str(cmd_counter) + " data points.")
+    return insert_list, remove_list
 
 
 if __name__ == "__main__":
 
-    time.sleep(10)
+    # time.sleep(10)
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-t', "--threads", action='store', default=1, help='Number of threads each for SQL insert and remove.')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
-
     input_arg = parser.parse_args()
     try:
         sys.argv[1]
@@ -74,7 +129,7 @@ if __name__ == "__main__":
         parser.print_help()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
-    cslog("Back Up Started...")
+    cslog("Data Back Up Started...")
 
     try:
         with open("server_info.yaml", 'r') as stream:
@@ -85,9 +140,9 @@ if __name__ == "__main__":
 
         cslog("Connecting to database " + str(mysql_cred["DATABASE"]) + ".")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        db_backup(connection)
+        insert_list, remove_list = sql_cmd_maker(connection)
+        back_up(insert_list, remove_list, int(input_arg.threads))
         cslog("Closing DB connection")
-        connection.close()
 
         logging.shutdown()
         if platform.system() == "linux" or platform.system() == "linux2": os.system("sudo apt-get clean")
