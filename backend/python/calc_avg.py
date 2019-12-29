@@ -74,7 +74,7 @@ def calc_avg(avg_list, mac_list, connection):
         avg_hum = round(result[0][1], 2)
         insert_avg_cmd = "INSERT INTO daily_avg (mac, date, avg_temp, avg_hum) VALUES('" + mac + "', " + str(item[1]) + ", " + str(avg_temp) + ", " + str(avg_hum) + ");"
         cursor.execute(insert_avg_cmd)
-        connection.commit()
+    connection.commit()
 
 
 if __name__ == "__main__":
@@ -88,6 +88,8 @@ if __name__ == "__main__":
     except:
         parser.print_help()
 
+    if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    logging.Formatter.converter = time.gmtime
     cslog("Calculating Daily Averages.")
 
     try:

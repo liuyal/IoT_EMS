@@ -226,6 +226,29 @@ def http_generator_wrapper(ip, mac, start_date, end_date, threads):
     print("")
 
 
+def sql_random_data_generator(mac_list, start_date, end_date, n=50):
+    epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    with open("../server_info.yaml", 'r') as stream:
+        try:
+            mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+        except yaml.YAMLError as exc:
+            print(exc)
+    connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+    cursor = connection.cursor()
+    for i in range(0, n):
+        # random.seed(i)
+        # mac = rand_mac()
+        mac = mac_list[random.randint(0, len(mac_list) - 1)]
+        epoch = random.randint(epoch_start, epoch_end)
+        temp = round(random.uniform(-10, 50), 2)
+        hum = round(random.uniform(0, 100), 2)
+        sql_cmd = "INSERT INTO DATA(mac, time, temp, hum) VALUES('" + mac + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ");"
+        cursor.execute(sql_cmd)
+        sys.stdout.write("[" + str(i) + "]" + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + " | " + sql_cmd + "\n")
+    connection.commit()
+
+
 def sql_data_generator(thread_id, connection, mac, start, end):
     epoch = int(start)
     cursor = connection.cursor()
@@ -234,9 +257,9 @@ def sql_data_generator(thread_id, connection, mac, start, end):
         hum = round(random.uniform(0, 100), 2)
         insert_sql_cmd = "INSERT INTO data(mac, time, temp, hum) VALUES('" + mac + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ")"
         cursor.execute(insert_sql_cmd)
-        connection.commit()
         sys.stdout.write("[" + str(thread_id) + "] " + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + " | " + insert_sql_cmd + "\n")
         epoch = epoch + 60
+    connection.commit()
 
 
 def sql_generator_wrapper(mac, start_date, end_date, threads):
@@ -285,10 +308,12 @@ if __name__ == "__main__":
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191228, end_date=20191230, threads=200)
+    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
+    # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=3000)
     # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
+    # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191230, n=500)
     # add_nodes(mac_list)
     # sql_connector_test()
     # time_check(ip)
-    time_check_sql()
+    # time_check_sql()
     # db_validate(ip)

@@ -76,13 +76,12 @@ def update_node_db_status(update_list, connection):
             cursor.execute(search_cmd)
             result = cursor.fetchall()
             if len(result) < 1:
-                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status, display) VALUES('" + str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE, FALSE)"
+                add_node = "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('" + str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", TRUE)"
                 cursor.execute(add_node)
-                connection.commit()
             else:
                 update_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
                 cursor.execute(update_cmd)
-                connection.commit()
+        connection.commit()
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
 
@@ -110,7 +109,7 @@ if __name__ == "__main__":
         sys.exit()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
-
+    logging.Formatter.converter = time.gmtime
     if input_arg.update and input_arg.PORT < 1: cslog("-L flag must be set for updating database. -h for help", "error")
 
     try:

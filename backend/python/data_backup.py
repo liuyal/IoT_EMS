@@ -24,7 +24,7 @@ def thread(thread_id, connection, list, start, end):
     for i in range(start, end + 1):
         # sys.stdout.write(str(thread_id) + " [" + str(i) + "] " + list[i] + "\n")
         cursor.execute(list[i])
-        connection.commit()
+    connection.commit()
     connection.close()
 
 
@@ -129,6 +129,7 @@ if __name__ == "__main__":
         parser.print_help()
 
     if input_arg.log: logging.basicConfig(filename="./appServer.log", filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    logging.Formatter.converter = time.gmtime
     cslog("Data Back Up Started...")
 
     try:
