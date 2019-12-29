@@ -36,6 +36,15 @@ def db_validate(ip):
     main_table.remove("daily_avg")
     main_table.remove("system_config")
     del wrong_data["nodes"], wrong_data["system_config"]
+
+    if len(tables) == 1 and tables[0] == "data":
+        try:
+            response = requests.get(read_table + "data")
+            content = response.json()["data"]
+        except Exception as error:
+            print("Empty: " + str(error))
+            return
+
     for item in tables:
         data[item] = []
         response = requests.get(read_table + item)
@@ -83,6 +92,7 @@ def db_validate(ip):
         cursor.execute("USE " + str(connection.database) + ";")
         for cmd_item in remove_cmd: cursor.execute(cmd_item)
         for cmd_item in add_cmd: cursor.execute(cmd_item)
+        connection.commit()
     except mysql.connector.Error as error:
         print(str(cmd_item) + "\nFailed access table {}".format(error))
 
@@ -335,16 +345,17 @@ def sql_generator_wrapper(mac, start_date, end_date, threads):
 
 
 if __name__ == "__main__":
+
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
-    # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=3000)
+    db_reset()
+    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
+    # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=5)
     # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
     # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191230, n=500)
     # add_nodes(mac_list)
     # sql_connector_test()
     # time_check(ip)
     # time_check_sql()
-    db_reset()
     # db_validate(ip)

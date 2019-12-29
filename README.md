@@ -52,6 +52,9 @@ ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';
 SHOW VARIABLES LIKE "max_connections";
 SET GLOBAL max_connections = 500;
 
+SHOW VARIABLES LIKE 'innodb_lock_wait_timeout';
+SET GLOBAL innodb_lock_wait_timeout = 300;
+
 SELECT * FROM data ORDER BY time DESC LIMIT 1;
 SELECT COUNT(*) FROM nodes WHERE status=true;
 ```

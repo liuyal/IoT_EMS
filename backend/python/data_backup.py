@@ -56,12 +56,12 @@ def back_up(insert_list, remove_list, n_threads):
 
     if insert_end != insert_len - 1:
         conn_end1 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        insert_thread = threading.Thread(target=thread, args=(i + 1, conn_end1, insert_list, insert_end, insert_len - 1))
+        insert_thread = threading.Thread(target=thread, args=(i + 1, conn_end1, insert_list, insert_end + 1, insert_len - 1))
         thread_list.append(insert_thread)
 
     if remove_end != remove_len - 1:
         conn_end2 = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
-        remove_thread = threading.Thread(target=thread, args=(i + 1, conn_end2, remove_list, remove_end, remove_len - 1))
+        remove_thread = threading.Thread(target=thread, args=(i + 1, conn_end2, remove_list, remove_end + 1, remove_len - 1))
         thread_list.append(remove_thread)
 
     for item in thread_list: item.start()
