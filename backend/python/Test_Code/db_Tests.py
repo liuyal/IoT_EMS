@@ -349,8 +349,8 @@ if __name__ == "__main__":
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-    db_reset()
-    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
+    # db_reset()
+    # sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191230, threads=200)
     # sql_random_data_generator(mac_list, start_date=20191220, end_date=20191230, n=5)
     # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
     # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191230, n=500)
