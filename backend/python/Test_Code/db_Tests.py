@@ -1,4 +1,4 @@
-import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading
+import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading, cProfile
 from datetime import date, timedelta, timezone
 import mysql.connector
 from mysql.connector import Error
@@ -119,14 +119,17 @@ def time_check(ip):
     tables = []
     for item in table_resp: tables.append(item['table'])
     for date in tables:
-        if date != "nodes" and date != "system_config" and date != "daily_avg":
-            response = requests.get(read_table + date)
-            resp = response.json()["data"]
-            print(date)
-            for item in resp:
-                epoch_time = item["time"]
-                times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
-                print("\t" + str(times))
+        try:
+            if date != "nodes" and date != "system_config" and date != "daily_avg":
+                response = requests.get(read_table + date)
+                resp = response.json()["data"]
+                print(date)
+                for item in resp:
+                    epoch_time = item["time"]
+                    times = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(int(epoch_time)))
+                    print("\t" + str(times))
+        except Exception as error:
+            print(error)
 
 
 def add_nodes(mac):
@@ -147,7 +150,7 @@ def add_nodes(mac):
         print("Failed access table {}".format(error))
 
 
-def random_data_generator(mac_list, ip, start_date, end_date, n=50):
+def http_random_data_generator(mac_list, ip, start_date, end_date, n=50):
     epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     for i in range(0, n):
@@ -162,7 +165,7 @@ def random_data_generator(mac_list, ip, start_date, end_date, n=50):
         sys.stdout.write("[" + str(i) + "]" + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
 
 
-def data_generator(ip, mac, start, end):
+def http_data_generator(ip, mac, start, end):
     epoch = int(start)
     while epoch < int(end):
         temp = round(random.uniform(-10, 50), 2)
@@ -173,7 +176,7 @@ def data_generator(ip, mac, start, end):
         epoch = epoch + 60
 
 
-def generator_wrapper(ip, mac, start_date, end_date, threads):
+def http_generator_wrapper(ip, mac, start_date, end_date, threads):
     epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
     Delta = int(epoch_end - epoch_start)
@@ -191,18 +194,64 @@ def generator_wrapper(ip, mac, start_date, end_date, threads):
         epoch_start = epoch_start + req_per_threads * 60
     list.append(list[-1] + req_per_threads * 60)
     for i in range(0, threads):
-        gen_thread = threading.Thread(target=data_generator, args=(ip, mac, list[i], list[i + 1]))
+        gen_thread = threading.Thread(target=http_data_generator, args=(ip, mac, list[i], list[i + 1]))
         thread_list.append(gen_thread)
     for item in thread_list: item.start()
+    for item in thread_list: item.join()
+    print("")
 
+def sql_data_generator(connection, mac, start, end):
+    epoch = int(start)
+    cursor = connection.cursor()
+    while epoch < int(end):
+        temp = round(random.uniform(-10, 50), 2)
+        hum = round(random.uniform(0, 100), 2)
+        insert_sql_cmd = "INSERT INTO data(mac, time, temp, hum) VALUES('" + mac + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ")"
+        cursor.execute(insert_sql_cmd)
+        connection.commit()
+        sys.stdout.write(time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_sql_cmd + "\n")
+        epoch = epoch + 60
+
+
+def sql_generator_wrapper(mac, start_date, end_date, threads):
+    epoch_start = int(datetime.datetime(int(str(start_date)[0:4]), int(str(start_date)[4:6]), int(str(start_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    epoch_end = int(datetime.datetime(int(str(end_date)[0:4]), int(str(end_date)[4:6]), int(str(end_date)[6:8]), 0, 0, tzinfo=timezone.utc).timestamp())
+    Delta = int(epoch_end - epoch_start)
+    n_requests = int(Delta / 60)
+    req_per_threads = int(n_requests / threads)
+    print("Start:\t" + str(epoch_start))
+    print("End:\t" + str(epoch_end))
+    print("Delta:\t" + str(Delta))
+    print("n_req:\t" + str(n_requests))
+    print("req/t:\t" + str(req_per_threads))
+    list = []
+    thread_list = []
+    for i in range(0, threads):
+        list.append(epoch_start)
+        epoch_start = epoch_start + req_per_threads * 60
+    list.append(list[-1] + req_per_threads * 60)
+    for i in range(0, threads):
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        gen_thread = threading.Thread(target=sql_data_generator, args=(connection, mac, list[i], list[i + 1]))
+        thread_list.append(gen_thread)
+    for item in thread_list: item.start()
+    for item in thread_list: item.join()
+    print("")
 
 if __name__ == "__main__":
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-    # generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191225, end_date=20191228, threads=40)
+    # http_generator_wrapper(ip="localhost", mac="00:00:00:00:00:01", start_date=20191227, end_date=20191228, threads=100)
+    sql_generator_wrapper(mac="00:00:00:00:00:01", start_date=20191220, end_date=20191228, threads=100)
+
     # add_nodes(mac_list)
-    # random_data_generator(mac_list, ip, start_date=20191220, end_date=20191227, n=500)
+    # http_random_data_generator(mac_list, ip, start_date=20191220, end_date=20191227, n=500)
     # sql_connector_test()
-    time_check(ip)
+    # time_check(ip)
     # db_validate(ip)

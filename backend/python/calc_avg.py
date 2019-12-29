@@ -23,6 +23,14 @@ def check_daily_avg(connection):
     cursor.execute("USE " + str(connection.database))
     cslog("Checking daily_avg table.")
     try:
+        cursor.execute("SHOW TABLES;")
+        result = cursor.fetchall()
+        found = False
+        for item in result:
+            if "daily_avg" in item[0]:
+                found = True
+        if not found:
+            cursor.execute("CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
         cursor.execute("SELECT mac, date FROM daily_avg;")
         result = cursor.fetchall()
         return result
@@ -47,14 +55,26 @@ def check_nova(connection):
 
 
 def calc_avg(avg_list, mac_list, connection):
+    cslog("Calculating daily averages")
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database))
+    if avg_list == None:
+        avg_list = []
     for pop in avg_list:
-        for item in mac_list:
-            if str(item[0]) == str(pop[0]) and str(item[1]) == str(pop[1]):
-                mac_list.remove(item)
-
-    print()
+        for mac in mac_list:
+            if str(mac[0]) == str(pop[0]) and str(mac[1]) == str(pop[1]):
+                mac_list.remove(mac)
+    for item in mac_list:
+        mac = item[0]
+        date = item[1] + "_data"
+        avg_cmd = "SELECT AVG(temp), AVG(hum) FROM " + date + " WHERE mac='" + mac + "';"
+        cursor.execute(avg_cmd)
+        result = cursor.fetchall()
+        avg_temp = round(result[0][0], 2)
+        avg_hum = round(result[0][1], 2)
+        insert_avg_cmd = "INSERT INTO daily_avg (mac, date, avg_temp, avg_hum) VALUES('" + mac + "', " + str(item[1]) + ", " + str(avg_temp) + ", " + str(avg_hum) + ");"
+        cursor.execute(insert_avg_cmd)
+        connection.commit()
 
 
 if __name__ == "__main__":
