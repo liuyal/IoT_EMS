@@ -342,8 +342,8 @@ def sql_generator_wrapper(mac, start_date, end_date, threads):
 
 if __name__ == "__main__":
 
-    start_date = 20191120
-    end_date = 20191125
+    start_date = 20191216
+    end_date = 20191227
     n_threads = 200
 
     ip = "localhost"

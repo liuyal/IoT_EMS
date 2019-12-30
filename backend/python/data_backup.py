@@ -117,7 +117,6 @@ def sql_cmd_maker(connection):
 
 if __name__ == "__main__":
 
-    # time.sleep(10)
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-t', "--threads", action='store', default=1, help='Number of threads each for SQL insert and remove.')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')

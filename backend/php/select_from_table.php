@@ -14,20 +14,22 @@
         $table = "data";
     }
 
-    try { 
-        $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
-        $db = mysqli_select_db($connect, DB_DATABASE);
+    $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
+    $db = mysqli_select_db($connect, DB_DATABASE);
+
+    if ($db) {
         $response["message"][0] = "Server Connected successfully";
     }
-    catch(PDOException $e){$response["message"][0] = "Server Connection failed: " . $e->getMessage();}
-
-    $result = mysqli_query($connect, "SELECT * FROM $table");
-
-    if (!$result){
+    else {
         $response["success"] = 0;
-        $response["message"][1] = "No matching table found";
+        $response["message"][0] = "Server Connection failed";
+        echo json_encode($response);
+        exit;
     }
-    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'data')) {
+
+    $result = mysqli_query($connect, "SELECT * FROM $table;");
+
+    if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'data')) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -40,7 +42,7 @@
         $response["success"] = 1;
         $response["message"][1] = "Data found successfully";
     } 
-    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'nodes')) {
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'nodes')) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -53,9 +55,9 @@
             array_push($response["data"], $data);
         }
         $response["success"] = 1;
-        $response["message"][1] = "Node Data found successfully";
+        $response["message"][1] = "Node data found successfully";
     }
-    else if (mysqli_num_rows($result) > 0 && strstr( $table, 'system_config')) {
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'system_config')) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -64,11 +66,28 @@
             array_push($response["data"], $data);
         }
         $response["success"] = 1;
-        $response["message"][1] = "System Config Data found successfully";
+        $response["message"][1] = "System Configuration data found successfully";
     } 
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'daily_avg')) {
+        $response["data"] = array();
+        while ($row = mysqli_fetch_array($result)) {
+            $data = array();
+            $data["mac"] = $row["mac"];
+            $data["date"] = $row["date"];
+            $data["avg_temp"] = $row["avg_temp"];
+            $data["avg_hum"] = $row["avg_hum"];
+            array_push($response["data"], $data);
+        }
+        $response["success"] = 1;
+        $response["message"][1] = "Daily average data found successfully";
+    }
+    else if ($result && mysqli_num_rows($result) < 1) {
+        $response["success"] = 0;
+        $response["message"][1] = "No data found in table: $table";
+    }
     else {
         $response["success"] = 0;
-        $response["message"][1] = "No data found";
+        $response["message"][1] = "No table matching input: $table found";
     }
 
     echo json_encode($response);

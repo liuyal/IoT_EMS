@@ -54,7 +54,7 @@ def check_nova(connection):
     return mac_list
 
 
-def calc_avg(avg_list, mac_list, connection):
+def calc_daily_avg(avg_list, mac_list, connection):
     cslog("Calculating daily averages")
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database) + ";")
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
         avg_list = check_daily_avg(connection)
         mac_list = check_nova(connection)
-        calc_avg(avg_list, mac_list, connection)
+        calc_daily_avg(avg_list, mac_list, connection)
 
         cslog("Closing DB connection")
         connection.close()
