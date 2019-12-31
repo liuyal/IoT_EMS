@@ -10,6 +10,17 @@
     $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
     $db = mysqli_select_db($connect, DB_DATABASE);
 
+    if (isset($_GET["range"])) {
+        $range = $_GET["range"];
+    }
+    else {
+        $response["message"][0] = "Missing input parameters";
+        $response["success"] = 0;
+        echo json_encode($response);
+        exit;
+    }
+
+
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
     }
@@ -20,23 +31,29 @@
         exit;
     }
 
-    $result = mysqli_query($connect, "SHOW TABLES;");
-     
-    if ($result && mysqli_num_rows($result) > 0) {
-        $response["data"] = array();
-        while ($row = mysqli_fetch_array($result)) {
-            $data = array();
-            $data["table"] = $row["Tables_in_nova"];
-            array_push($response["data"], $data);
-        }
-        $response["success"] = 1;
-        $response["message"][1] = "Tables found successfully";
-    }	
+
+    if (strstr( $range, "current")) { 
+    
+    }
+    else if (strstr( $range, "hourly")) {
+
+    }
+    else if (strstr( $range, "daily")) {
+
+    }
+    else if (strstr( $range, "monthly")) {
+
+    }
+    else if (strstr( $range, "yearly")) {
+
+    }
     else {
-    	$response["success"] = 0;
-        $response["message"][1] = "Empty database, no tables found";
+        $response["success"] = 0;
+        $response["message"][0] = "Incorrect incorrect parameter";
     }
 
     echo json_encode($response);
     mysqli_close($connect);
 ?>
+
+

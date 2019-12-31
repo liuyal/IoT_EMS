@@ -1,5 +1,5 @@
 <?php
-    ini_set('display_errors','on');
+    ini_set("display_errors","on");
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
 
@@ -7,8 +7,8 @@
     $filepath = realpath (dirname(__FILE__));
     require_once($filepath."/dbconfig.php");
 
-    if (isset($_GET['table'])) {
-        $table = $_GET['table'];
+    if (isset($_GET["table"])) {
+        $table = $_GET["table"];
     }
     else {
         $table = "data";
@@ -29,7 +29,7 @@
 
     $result = mysqli_query($connect, "SELECT * FROM $table;");
 
-    if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'data')) {
+    if ($result && mysqli_num_rows($result) > 0 && strstr($table, "data")) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -42,7 +42,7 @@
         $response["success"] = 1;
         $response["message"][1] = "Data found successfully";
     } 
-    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'nodes')) {
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, "nodes")) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -57,7 +57,7 @@
         $response["success"] = 1;
         $response["message"][1] = "Node data found successfully";
     }
-    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'system_config')) {
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, "system_config")) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();
@@ -69,7 +69,7 @@
         $response["success"] = 1;
         $response["message"][1] = "System Configuration data found successfully";
     } 
-    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, 'daily_avg')) {
+    else if ($result && mysqli_num_rows($result) > 0 && strstr($table, "daily_avg")) {
         $response["data"] = array();
         while ($row = mysqli_fetch_array($result)) {
             $data = array();

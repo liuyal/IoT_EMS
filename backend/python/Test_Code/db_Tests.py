@@ -342,21 +342,20 @@ def sql_generator_wrapper(mac, start_date, end_date, threads):
 
 if __name__ == "__main__":
 
-    start_date = 20191216
-    end_date = 20191227
+    start_date = 20191230
+    end_date = 20200101
     n_threads = 200
 
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
-
     # db_reset()
 
-    # sql_generator_wrapper("00:00:00:00:00:01", start_date, end_date, n_threads)
-    # sql_random_data_generator(mac_list, start_date, end_date, 1000)
+    sql_generator_wrapper("00:00:00:00:00:01", start_date, end_date, n_threads)
+    # sql_random_data_generator(mac_list, start_date, end_date, 5)
 
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, end_date, n_threads)
-    http_random_data_generator(mac_list, ip, start_date, end_date, 300)
+    # http_random_data_generator(mac_list, ip, start_date, end_date, 300)
 
     # add_nodes(mac_list)
 

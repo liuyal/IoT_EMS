@@ -1,5 +1,5 @@
 <?php
-    ini_set('display_errors','on');
+    ini_set("display_errors","on");
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
 
@@ -7,11 +7,11 @@
     $filepath = realpath (dirname(__FILE__));
     require_once($filepath."/dbconfig.php");
 
-    if (isset($_GET['mac']) && isset($_GET['time']) && isset($_GET['temp']) && isset($_GET['hum'])) {
-        $mac = $_GET['mac'];
-        $time = $_GET['time'];
-        $temp = $_GET['temp'];
-        $hum = $_GET['hum'];
+    if (isset($_GET["mac"]) && isset($_GET["time"]) && isset($_GET["temp"]) && isset($_GET["hum"])) {
+        $mac = $_GET["mac"];
+        $time = $_GET["time"];
+        $temp = $_GET["temp"];
+        $hum = $_GET["hum"];
     } 
     else {
         $response["success"] = 0;
@@ -33,7 +33,7 @@
         exit;
     }
 
-    $insert_result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
+    $insert_result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES("$mac","$time","$temp","$hum");");
     
     if ($insert_result) { 
         $response["message"][1] = "Data successfully inserted"; 
@@ -42,21 +42,21 @@
         $response["message"][1] = "Data failed to insert"; 
     }
 
-    $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac='$mac';");
+    $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac="$mac";");
     $update_result = false;
 
     if ($find_mac && $find_mac->num_rows == 0) {
-        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, '$time', true)");
+        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES("$mac", "0.0.0.0", 0, "$time", true)");
     }
     else if ($find_mac) {
-        $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
+        $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac="$mac";");
     }
 
     if ($update_result) { 
-        $response["message"][2] = "Node:'$mac' status updated"; 
+        $response["message"][2] = "Node:"$mac" status updated"; 
     }
     else { 
-        $response["message"][2] = "Node:'$mac' failed to update status"; 
+        $response["message"][2] = "Node:"$mac" failed to update status"; 
     }
 
     if ($insert_result && $update_result) {

@@ -1,5 +1,5 @@
 <?php
-    ini_set('display_errors','on');
+    ini_set("display_errors","on");
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
 
@@ -8,8 +8,8 @@
     require_once($filepath."/dbconfig.php");
     $db_name = DB_DATABASE;
 
-    if (isset($_GET['table'])) {
-        $table = $_GET['table'];
+    if (isset($_GET["table"])) {
+        $table = $_GET["table"];
     }
     else {
         $response["message"][0] = "Missing input parameters";
