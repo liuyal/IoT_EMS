@@ -128,8 +128,9 @@ if __name__ == "__main__":
         parser.print_help()
 
     log_path = os.getcwd() + os.sep + "appServer.log"
-    if input_arg.log: logging.basicConfig(filename=log_path, filemode='a', format='%(asctime)s, %(name)s, [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
-    logging.Formatter.converter = time.gmtime
+    if input_arg.log: 
+        logging.basicConfig(filename=log_path, filemode='a', format='%(asctime)s, %(name)s, [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+        logging.Formatter.converter = time.gmtime
 
     cslog("Data Back Up Started...")
     try:
