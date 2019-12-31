@@ -20,39 +20,69 @@
         exit;
     }
     
-    $n_online = mysqli_query($connect, "SELECT COUNT(*) as count FROM nodes WHERE status=true;");
-    $count = mysqli_fetch_assoc($n_online);
+    $check_online = mysqli_query($connect, "SELECT COUNT(*) as count FROM nodes WHERE status=true;");
+    $n_online = mysqli_fetch_assoc($check_online);
 
-    $get_mac = mysqli_query($connect, "SELECT display_mac as mac FROM system_config;");
-    $mac_array = mysqli_fetch_assoc($get_mac);
-    $mac = implode($mac_array);
+    if ($check_online) { $response["data"]["online"] = $n_online["count"]; }
+    else { $response["data"]["online"] = 0; }
 
-    $temp_hum = mysqli_query($connect, "SELECT * FROM data WHERE mac='$mac' ORDER BY time DESC LIMIT 1;");
-    $data = mysqli_fetch_assoc($temp_hum);
-
-    $history = mysqli_query($connect, "SELECT temp, hum FROM data WHERE mac='$mac' ORDER BY time DESC LIMIT 60;");
-    $last_hour = mysqli_fetch_assoc($history);
-
-
-    if ($data && $n_online) {
-        $response["message"][1] = "Fresh Data Found";
-        $response["data"]["online"] = $count["count"];
-        $response["data"]["mac"] = $data["mac"];
-        $response["data"]["temp"] = $data["temp"];
-        $response["data"]["hum"] = $data["hum"];
-        $response["data"]["history"] = [0];
-        $response["success"] = 1;
-    }   
-    else {
-        $response["message"][1] = "No Data Found";
-        $response["data"]["online"] = 0;
-        $response["data"]["mac"] = "00:00:00:00:00:00";
-        $response["data"]["temp"] = 0.00;
-        $response["data"]["hum"] = 0.00;
-        $response["data"]["history"] = [0];
+    $get_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE display=true;");
+    if ($get_mac->num_rows == 0) {
         $response["success"] = 0;
+        $response["message"][1] = "Nodes table empty";
+        echo json_encode($response);
+        exit;
+    }
+    
+    $history = false;
+    $counter = 0;
+    $limit = 60;
+
+    while ($row = mysqli_fetch_array($get_mac)) {
+        
+        $mac = $row["mac"];
+        $history = mysqli_query($connect, "SELECT mac, time, temp, hum FROM data WHERE mac='$mac' ORDER BY time DESC LIMIT $limit;");
+        $data = mysqli_fetch_all($history);
+
+        if ($history && count($data) > 0 && count($data) == $limit) {
+            $response["message"][$counter + 1] = "Fresh data found for $mac";
+            $response["data"][$counter]["mac"] = $mac;
+            $response["data"][$counter]["last_temp"] = $data[0][2];
+            $response["data"][$counter]["last_hum"] = $data[0][3];
+            $response["data"][$counter]["history"] = $data;
+        }
+        else if ($history && count($data) > 0 && count($data) < $limit){
+            $missing = $limit - count($data);
+            $epoch = intval($data[$missing - 1][1]) - 86000;
+            $dt = new DateTime("@$epoch");
+            $table = $dt->format("Ymd") . "_data";
+
+            $history2 = mysqli_query($connect, "SELECT mac, time, temp, hum FROM $table WHERE mac='$mac' ORDER BY time DESC LIMIT $missing;");
+            $data2 = mysqli_fetch_all($history2);
+
+            $response["message"][$counter + 1] = "Fresh data found for $mac";
+            $response["data"][$counter]["mac"] = $mac;
+            $response["data"][$counter]["last_temp"] = $data[0][2];
+            $response["data"][$counter]["last_hum"] = $data[0][3];
+            $response["data"][$counter]["history"] = array_merge($data, $data2);
+        }   
+        else {
+            $response["message"][$counter + 1] = "No data found for $mac";
+            $response["data"][$counter]["mac"] = $mac;
+            $response["data"][$counter]["last_temp"] = 0;
+            $response["data"][$counter]["last_hum"] = 0;
+            $response["data"][$counter]["history"] = [0];   
+        }
+        $counter++;
     }
 
+    if ($history && $check_online) {
+        $response["success"] = 1;
+    }
+    else {
+        $response["success"] = 0;
+    }
+    
     echo json_encode($response);
     mysqli_close($connect);
 ?>

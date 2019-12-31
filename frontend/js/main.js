@@ -26,8 +26,8 @@ function load_fresh() {
         RequestData(url, function (json) {
             var data = json;
             var online = data["data"]["online"];
-            var temp = data["data"]["temp"];
-            var hum = data["data"]["hum"];
+            var temp = data["data"][0]["last_temp"];
+            var hum = data["data"][0]["last_hum"];
             document.getElementById('n_online').innerHTML = online;
             document.getElementById('temp').innerHTML = temp + "&ordm;C";
             document.getElementById('hum').innerHTML = hum + "%";
