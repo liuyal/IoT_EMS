@@ -86,6 +86,12 @@ def update_node_db_status(update_list, connection):
         cslog("Failed {}".format(error), flag="error")
 
 
+# TODO update SQL
+def insert_data(data, connection):
+    print()
+
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
@@ -147,7 +153,7 @@ if __name__ == "__main__":
     thread_send.join()
     if input_arg.PORT > 0: thread_listen.join()
 
-    if input_arg.update and input_arg.listen:
+    if input_arg.update and input_arg.PORT > 0:
         msg = msg_queue.get()
         mac_list = (list(set(msg_queue.get())))
         update_list = []
@@ -162,6 +168,7 @@ if __name__ == "__main__":
         cslog("Connecting to database " + str(mysql_cred["DATABASE"]) + ".")
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         update_node_db_status(update_list, connection)
+        insert_data(msg, connection)
         cslog("Closing DB connection")
         connection.close()
 

@@ -388,8 +388,8 @@ if __name__ == "__main__":
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
 
     db_reset()
-    sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
-    sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
+    # sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
+    # sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
     add_nodes(mac_list)
     set_display(mac_list[0:2], ip)
     time_check_sql()

@@ -31,10 +31,11 @@ def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
         sock.close()
 
 
-def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
+def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996):
     global data
     dst_ip = host_ip
     msg = b""
+    response = ""
     while True:
         try:
             cv.acquire()
@@ -45,8 +46,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
                 temp = round(random.uniform(-10, 40), 2)
                 hum = round(random.uniform(0, 100), 2)
                 insert_req = "http://" + host_ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-                # insert_req = "http://localhost/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-                response = requests.get(insert_req)
+                if input_arg.http: response = requests.get(insert_req)
                 msg = ("[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n")
                 sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", " ") + str(response.json()) + "\n")
             elif "ping" in str(data):
@@ -63,7 +63,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
                 sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
 
             packet = IP(src=ip, dst=dst_ip) / UDP(sport=port, dport=port) / msg
-            send(packet, verbose=False)
+            if input_arg.sql: send(packet, verbose=False)
 
         except Exception as error:
             print(str(error))
@@ -72,12 +72,21 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="0.0.0.0", port=9996):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('-http', action='store_true', dest="http", default=False, help='HTTP mode')
+    parser.add_argument('-sql', action='store_true', dest="sql", default=False, help='SQL mode')
     parser.add_argument('-n', action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
+
+    print("\n" + str(input_arg))
+
     try:
         sys.argv[1]
     except:
         parser.print_help();
+
+    if input_arg.http == False and input_arg.sql == False:
+        input_arg.http = True
+        input_arg.sql = True
 
     data = ""
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
