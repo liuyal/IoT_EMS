@@ -33,9 +33,9 @@
         exit;
     }
 
-    $result1 = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
+    $insert_result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac','$time','$temp','$hum');");
     
-    if ($result1) { 
+    if ($insert_result) { 
         $response["message"][1] = "Data successfully inserted"; 
     } 
     else { 
@@ -43,23 +43,23 @@
     }
 
     $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac='$mac';");
-    $result2 = false;
+    $update_result = false;
 
     if ($find_mac && $find_mac->num_rows == 0) {
-        $result2 = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, '$time', true)");
+        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, '$time', true)");
     }
     else if ($find_mac) {
-        $result2 = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
+        $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
     }
 
-    if ($result2) { 
-        $response["message"][2] = "node:'$mac' status updated"; 
+    if ($update_result) { 
+        $response["message"][2] = "Node:'$mac' status updated"; 
     }
     else { 
-        $response["message"][2] = "node:'$mac' failed to update status"; 
+        $response["message"][2] = "Node:'$mac' failed to update status"; 
     }
 
-    if ($result1 && $result2){
+    if ($insert_result && $update_result) {
         $response["success"] = 1;
     }
     else {

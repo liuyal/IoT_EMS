@@ -47,6 +47,8 @@ date +%T -s "23:59:50"
 --SQL--
 mysqldump -u root --databases nova > dump.sql
 
+mysql -u root -p nova < dump2.sql
+
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
 GRANT ALL PRIVILEGES ON *.* TO  'nova'@'%';
 ALTER USER 'nova'@'%' IDENTIFIED WITH mysql_native_password BY 'Airlink_1';  

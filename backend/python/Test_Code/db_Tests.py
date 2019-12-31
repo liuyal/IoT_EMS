@@ -117,8 +117,8 @@ def db_reset():
         cursor.execute("USE " + str(mysql_cred["DATABASE"]) + ";")
 
         cursor.execute("CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
-        cursor.execute("CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
-        cursor.execute("CREATE Table system_config(host_ip CHAR(39), host_port INT);")
+        cursor.execute("CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, PRIMARY KEY (mac));")
+        cursor.execute("CREATE Table system_config(host_ip CHAR(39), host_port INT, display_mac VARCHAR(17));")
         cursor.execute("CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
         connection.commit()
         print("Reset Complete")
@@ -195,7 +195,7 @@ def add_nodes(mac):
         cursor.execute("USE " + str(connection.database) + ";")
         for item in mac:
             print("Adding node: " + str(item))
-            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, false, false)")
+            cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, false)")
             connection.commit()
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
@@ -356,7 +356,7 @@ if __name__ == "__main__":
     # sql_random_data_generator(mac_list, start_date, end_date, 1000)
 
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, end_date, n_threads)
-    # http_random_data_generator(mac_list, ip, start_date, end_date, 300)
+    http_random_data_generator(mac_list, ip, start_date, end_date, 300)
 
     # add_nodes(mac_list)
 

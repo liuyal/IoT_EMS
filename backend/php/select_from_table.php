@@ -63,6 +63,7 @@
             $data = array();
             $data["host_ip"] = $row["host_ip"];
             $data["host_port"] = $row["host_port"];
+            $data["display_mac"] = $row["display_mac"];
             array_push($response["data"], $data);
         }
         $response["success"] = 1;
