@@ -25,9 +25,9 @@ function load_fresh() {
         let url = "http://localhost/Temperature_System/backend/php/get_status.php";
         RequestData(url, function (json) {
             var data = json;
-            var online = data["message"]["online"];
-            var temp = data["message"]["temp"];
-            var hum = data["message"]["hum"];
+            var online = data["data"]["online"];
+            var temp = data["data"]["temp"];
+            var hum = data["data"]["hum"];
             document.getElementById('n_online').innerHTML = online;
             document.getElementById('temp').innerHTML = temp + "&ordm;C";
             document.getElementById('hum').innerHTML = hum + "%";

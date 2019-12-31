@@ -19,33 +19,37 @@
         echo json_encode($response);
         exit;
     }
-
     
-    // TODO: pick mac in sys_config
     $n_online = mysqli_query($connect, "SELECT COUNT(*) as count FROM nodes WHERE status=true;");
-    $temp_hum = mysqli_query($connect, "SELECT * FROM data ORDER BY time DESC LIMIT 1;");
     $count = mysqli_fetch_assoc($n_online);
+
+    $get_mac = mysqli_query($connect, "SELECT display_mac as mac FROM system_config;");
+    $mac_array = mysqli_fetch_assoc($get_mac);
+    $mac = implode($mac_array);
+
+    $temp_hum = mysqli_query($connect, "SELECT * FROM data WHERE mac='$mac' ORDER BY time DESC LIMIT 1;");
     $data = mysqli_fetch_assoc($temp_hum);
 
-    if ($n_online) {
-        $response["message"]["online"] = $count["count"];
-    }
-    else {
-        $response["message"]["online"] = 0;
-    }
+    $history = mysqli_query($connect, "SELECT temp, hum FROM data WHERE mac='$mac' ORDER BY time DESC LIMIT 60;");
+    $last_hour = mysqli_fetch_assoc($history);
 
-    if ($data) {
+
+    if ($data && $n_online) {
         $response["message"][1] = "Fresh Data Found";
-        $response["message"]["mac"] = $data["mac"];
-        $response["message"]["temp"] = $data["temp"];
-        $response["message"]["hum"] = $data["hum"];
+        $response["data"]["online"] = $count["count"];
+        $response["data"]["mac"] = $data["mac"];
+        $response["data"]["temp"] = $data["temp"];
+        $response["data"]["hum"] = $data["hum"];
+        $response["data"]["history"] = [0];
         $response["success"] = 1;
     }   
     else {
         $response["message"][1] = "No Data Found";
-        $response["message"]["mac"] = "00:00:00:00:00:00";
-        $response["message"]["temp"] = 0.00;
-        $response["message"]["hum"] = 0.00;
+        $response["data"]["online"] = 0;
+        $response["data"]["mac"] = "00:00:00:00:00:00";
+        $response["data"]["temp"] = 0.00;
+        $response["data"]["hum"] = 0.00;
+        $response["data"]["history"] = [0];
         $response["success"] = 0;
     }
 

@@ -20,7 +20,6 @@
         exit;
     }
 
-
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
     }
