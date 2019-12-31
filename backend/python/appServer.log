@@ -1,0 +1,5 @@
+2019-12-31 22:15:44, [INFO] root, Started UDP Command Handler
+2019-12-31 22:15:44, [INFO] root, Input: (HOST_IP=None, NODE_IP='192.168.1.255', NODE_PORT=9996, PORT=0, fetch=True, log=True, ping=False, reboot=False, t=5, update=False, verbose=True)
+2019-12-31 22:15:46, [INFO] root, Start Broadcasting: b'[fetch_data]\n' to 192.168.1.255:9996
+2019-12-31 22:15:47, [INFO] root, Broadcast Done.
+2019-12-31 22:15:47, [INFO] root, UDP Command Handler Complete.
