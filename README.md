@@ -32,8 +32,9 @@
 ### CODE & CMD
 ```
 --CRON--
-* * * * * sudo python3 /var/www/html/Temperature_System/backend/python/udp_cmd.py -f -u -l
-@midnight sudo python3 /var/www/html/Temperature_System/backend/python/data_backup.py -v -l
+* * * * * cd /var/www/html/Temperature_System/backend/python/ && sudo python3 /var/www/html/Temperature_System/backend/python/udp_cmd.py -f -l 2>&1
+@midnight cd /var/www/html/Temperature_System/backend/python/ && sudo python3 /var/www/html/Temperature_System/backend/python/data_backup.py -t 10 -l 2>&1
+
 
 --BASH--
 netstat -tlpn | grep mysql

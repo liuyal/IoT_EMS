@@ -64,7 +64,7 @@ def check_node_status(connection, timeout):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-t', "--timeout", action='store', dest="timeout", default=5, help='Verbose mode')
+    parser.add_argument('-t', "--timeout", action='store', dest="timeout", default=5, help='Node status time out (Default 5 minutes)')
     parser.add_argument('-v', "--verbose", action='store_true', help='Verbose mode')
     parser.add_argument('-l', "--log", action='store_true', help='Log to file')
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         parser.print_help()
 
     log_path = os.getcwd() + os.sep + "appServer.log"
-    if input_arg.log: logging.basicConfig(filename=log_path, filemode='a', format='%(asctime)s, [%(levelname)s] %(name)s, %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
+    if input_arg.log: logging.basicConfig(filename=log_path, filemode='a', format='%(asctime)s, %(name)s, [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
     logging.Formatter.converter = time.gmtime
 
     try:
