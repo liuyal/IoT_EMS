@@ -45,9 +45,9 @@ YESTERDAY_STAMP = date --date="1 day ago" +%Y%m%d
 date +%Y%m%d -s "20191217"
 date +%T -s "23:59:50"
 
+
 --SQL--
 mysqldump -u root --databases nova > dump.sql
-
 mysql -u root -p nova < dump2.sql
 
 CREATE USER 'nova'@'%' IDENTIFIED BY 'Airlink_1';
@@ -62,4 +62,9 @@ SET GLOBAL innodb_lock_wait_timeout = 300;
 
 SELECT * FROM data ORDER BY time DESC LIMIT 1;
 SELECT COUNT(*) FROM nodes WHERE status=true;
+
+
+--INSTALL--
+pip3 install scapy
+
 ```

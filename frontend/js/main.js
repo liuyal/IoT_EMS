@@ -44,9 +44,10 @@ function load_fresh() {
 
 function load_graph_data() {
 
-    let url = "http://localhost/Temperature_System/backend/php/select_from_table.php?table=data";
-    RequestData(url, function (json) {
-        var data = json["data"];
+    let url = "http://localhost/Temperature_System/backend/php/get_status.php";
+        RequestData(url, function (json) {
+        var data = json;
+
         
         console.log(data)
 

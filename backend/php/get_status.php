@@ -51,20 +51,29 @@
             $response["data"][$counter]["last_hum"] = $data[0][3];
             $response["data"][$counter]["history"] = $data;
         }
-        else if ($history && count($data) > 0 && count($data) < $limit){
+        else if ($history && count($data) > 0 && count($data) < $limit) {
             $missing = $limit - count($data);
-            $epoch = intval($data[$missing - 1][1]) - 86000;
+            $epoch = intval($data[count($data) - 1][1]) - 86000;
             $dt = new DateTime("@$epoch");
             $table = $dt->format("Ymd") . "_data";
 
             $history2 = mysqli_query($connect, "SELECT mac, time, temp, hum FROM $table WHERE mac='$mac' ORDER BY time DESC LIMIT $missing;");
-            $data2 = mysqli_fetch_all($history2);
+            if ($history2) {
+                $data2 = mysqli_fetch_all($history2);
+                $response["message"][$counter + 1] = "Fresh data found for $mac";
+                $response["data"][$counter]["mac"] = $mac;
+                $response["data"][$counter]["last_temp"] = $data[0][2];
+                $response["data"][$counter]["last_hum"] = $data[0][3];
+                $response["data"][$counter]["history"] = array_merge($data, $data2);
+            }
+            else {
+                $response["message"][$counter + 1] = "Fresh data found for $mac, (<1H)";
+                $response["data"][$counter]["mac"] = $mac;
+                $response["data"][$counter]["last_temp"] = $data[0][2];
+                $response["data"][$counter]["last_hum"] = $data[0][3];
+                $response["data"][$counter]["history"] = $data;
+            }
 
-            $response["message"][$counter + 1] = "Fresh data found for $mac";
-            $response["data"][$counter]["mac"] = $mac;
-            $response["data"][$counter]["last_temp"] = $data[0][2];
-            $response["data"][$counter]["last_hum"] = $data[0][3];
-            $response["data"][$counter]["history"] = array_merge($data, $data2);
         }   
         else {
             $response["message"][$counter + 1] = "No data found for $mac";
