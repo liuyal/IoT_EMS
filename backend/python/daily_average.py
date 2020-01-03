@@ -107,9 +107,9 @@ if __name__ == "__main__":
         avg_list = check_daily_avg(connection)
         mac_list = check_nova(connection)
         calc_daily_avg(avg_list, mac_list, connection)
-
         cslog("Closing DB connection")
         connection.close()
+
         logging.shutdown()
     except mysql.connector.Error as error:
         cslog("Failed {}".format(error), flag="error")

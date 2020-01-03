@@ -126,6 +126,31 @@ def db_reset():
         print("Failed access table {}".format(error))
 
 
+def get_last_time():
+    try:
+        with open("../server_info.yaml", 'r') as stream:
+            try:
+                mysql_cred = yaml.safe_load(stream)["mysql_cred"]
+            except yaml.YAMLError as exc:
+                print(exc)
+        connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
+        cursor = connection.cursor()
+        cursor.execute("USE " + str(connection.database) + ";")
+        cursor.execute("SELECT time FROM data ORDER BY time DESC;")
+        data = cursor.fetchall()
+        epoch = int(data [0][0])
+        gm_time = time.gmtime(epoch)
+        month = gm_time.tm_mon
+        day = gm_time.tm_mday
+        if month < 9: month = "0" + str(gm_time.tm_mon)
+        if day < 9: day = "0" + str(gm_time.tm_mday)
+        start_date = str(gm_time.tm_year) + str(month) + str(day)
+        start_time = str(gm_time.tm_hour) + ":" + str(gm_time.tm_min)
+        return start_date, start_time
+    except Exception as error:
+        print(error)
+
+
 def time_check_http(ip):
     show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
     read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
@@ -207,6 +232,7 @@ def set_display(mac, ip="localhost"):
             print(response)
             cursor.execute("UPDATE nodes SET status=true WHERE mac='" + item + "';")
             connection.commit()
+        print("")
     except Exception as error:
         print(error)
 
@@ -225,6 +251,7 @@ def add_nodes(mac):
             print("Adding node: " + str(item))
             cursor.execute("INSERT INTO nodes values('" + item + "', '0.0.0.0', 0, 0, false, false)")
         connection.commit()
+        print("")
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
 
@@ -377,22 +404,29 @@ def sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, threa
 
 
 if __name__ == "__main__":
-    start_date = 20191229
-    start_time = "00:00"
-    end_date = 20191231
-    end_time = "10:30"
-    n_threads = 200
-    n_data = 1
 
     ip = "localhost"
     mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
+    n_threads = 200
+    n_data = 1
+
+    # start_date, start_time = get_last_time()
+    # if start_date == 0:
+    #     start_date, start_time = 20191230, "00:00"
+    start_date, start_time = 20200101, "00:00"
+    # end_date, end_time = 20191231, "10:30"
+    end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-",""))
+    end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
 
     db_reset()
-    # sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
-    # sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
+    sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
+    sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
     add_nodes(mac_list)
     set_display(mac_list[0:2], ip)
     time_check_sql()
+
+    # sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
+    # sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
 
     # sql_random_data_generator(mac_list[0:2], start_date, start_time, end_date, end_time, n_data)
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
