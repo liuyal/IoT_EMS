@@ -66,5 +66,8 @@ SELECT COUNT(*) FROM nodes WHERE status=true;
 
 --INSTALL--
 pip3 install scapy
+pip install requests
+pip install mysql-connector
+
 
 ```
