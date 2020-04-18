@@ -1,7 +1,7 @@
 # Temperature_System
 
 
-## Server
+## Server UI
 
 - [Charts](https://www.chartjs.org/)
 
