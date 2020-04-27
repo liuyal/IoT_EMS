@@ -86,10 +86,22 @@ def update_node_db_status(update_list, connection):
         cslog("Failed {}".format(error), flag="error")
 
 
-# TODO update SQL
 def insert_data(data, connection):
-    print()
-
+    try:
+        cslog("Inserting data into database")
+        cursor = connection.cursor()
+        cursor.execute("USE " + str(connection.database) + ";")
+        for item in data:
+            packet = item["data"].decode("utf-8")[item["data"].decode("utf-8").index('[') + 1:item["data"].decode("utf-8").index(']')].split("|")
+            mac = item["mac"]
+            epoch = item["time"]
+            temp = packet[3]
+            hum = packet[4]
+            sql_cmd = "INSERT INTO DATA(mac, time, temp, hum) VALUES('" + str(mac) + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ");"
+            cursor.execute(sql_cmd)
+        connection.commit()
+    except Exception as error:
+        cslog("Failed {}".format(error), flag="error")
 
 
 if __name__ == "__main__":
@@ -161,7 +173,9 @@ if __name__ == "__main__":
         update_list = []
         for mac in mac_list:
             for item in reversed(msg):
-                if mac == item["mac"]: update_list.append(item); msg.pop(-1); break
+                if mac == item["mac"]:
+                    update_list.append(item)
+                    break
         with open("server_info.yaml", 'r') as stream:
             try:
                 mysql_cred = yaml.safe_load(stream)["mysql_cred"]

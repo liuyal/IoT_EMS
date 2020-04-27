@@ -16,8 +16,8 @@ def rand_mac():
 
 
 def db_validate(ip):
-    show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
-    read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
+    show_tables = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/show_tables.php"
+    read_table = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/select_from_table.php?table="
     main_table = []
     tables = []
     wrong_data = {}
@@ -113,13 +113,13 @@ def db_reset():
         except:
             print("Database " + str(mysql_cred["DATABASE"]) + " cannot be accessed or does not exist.")
 
-        cursor.execute("CREATE DATABASE " + str(mysql_cred["DATABASE"]) + ";")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS " + str(mysql_cred["DATABASE"]) + ";")
         cursor.execute("USE " + str(mysql_cred["DATABASE"]) + ";")
 
-        cursor.execute("CREATE TABLE data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
-        cursor.execute("CREATE Table nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
-        cursor.execute("CREATE Table system_config(host_ip CHAR(39), host_port INT);")
-        cursor.execute("CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
+        cursor.execute("CREATE TABLE IF NOT EXISTS data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
+        cursor.execute("CREATE Table IF NOT EXISTS nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
+        cursor.execute("CREATE Table IF NOT EXISTS system_config(host_ip CHAR(39), host_port INT);")
+        cursor.execute("CREATE TABLE IF NOT EXISTS daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
         connection.commit()
         print("Reset Complete\n")
     except mysql.connector.Error as error:
@@ -152,8 +152,8 @@ def get_last_time():
 
 
 def time_check_http(ip):
-    show_tables = "http://" + ip + "/Temperature_System/backend/php/show_tables.php"
-    read_table = "http://" + ip + "/Temperature_System/backend/php/select_from_table.php?table="
+    show_tables = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/show_tables.php"
+    read_table = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/select_from_table.php?table="
     response = requests.get(show_tables)
     table_resp = response.json()["data"]
     tables = []
@@ -207,8 +207,9 @@ def time_check_sql():
     except mysql.connector.Error as error:
         print("Failed access table {}".format(error))
 
+
 def status_time_check_http(ip):
-    get_status = "http://" + ip + "/Temperature_System/backend/php/get_status.php"
+    get_status = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/get_status.php"
     response = requests.get(get_status)
     table_resp = response.json()["data"]
     time_list = table_resp["0"]["history"]
@@ -227,7 +228,7 @@ def set_display(mac, ip="localhost"):
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
         cursor = connection.cursor()
         for item in mac:
-            req = "http://" + ip + "/Temperature_System/backend/php/set_display.php?mac=" + item + "&display=true"
+            req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/set_display.php?mac=" + item + "&display=true"
             response = requests.get(req)
             print(response)
             cursor.execute("UPDATE nodes SET status=true WHERE mac='" + item + "';")
@@ -266,7 +267,7 @@ def http_random_data_generator(mac_list, ip, start_date, start_time, end_date, e
         epoch = random.randint(epoch_start, epoch_end)
         temp = round(random.uniform(-10, 50), 2)
         hum = round(random.uniform(0, 100), 2)
-        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
         sys.stdout.write("[" + str(i) + "]" + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
 
@@ -276,7 +277,7 @@ def http_data_generator(ip, mac, start, end):
     while epoch < int(end):
         temp = round(random.uniform(-10, 50), 2)
         hum = round(random.uniform(0, 100), 2)
-        insert_req = "http://" + ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
         sys.stdout.write(time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
         epoch = epoch + 60
@@ -411,26 +412,27 @@ if __name__ == "__main__":
     n_data = 1
 
     # start_date, start_time = get_last_time()
-    # if start_date == 0:
-    #     start_date, start_time = 20191230, "00:00"
-    start_date, start_time = 20200101, "00:00"
-    # end_date, end_time = 20191231, "10:30"
+    # if start_date == 0: start_date, start_time = 20191231, "00:00"
+
+    start_date, start_time = 20200420, "00:00"
     end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-",""))
     end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
 
     db_reset()
-    sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
-    sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
-    add_nodes(mac_list)
-    set_display(mac_list[0:2], ip)
-    time_check_sql()
+
 
     # sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
     # sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
+    # add_nodes(mac_list)
+    # set_display(mac_list[0:2], ip)
+    # time_check_sql()
+
 
     # sql_random_data_generator(mac_list[0:2], start_date, start_time, end_date, end_time, n_data)
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
     # http_random_data_generator(mac_list, ip, start_date, start_time, end_date, end_time, n_data)
+
+
     # time_check_http(ip)
     # status_time_check_http(ip)
     # db_validate(ip)

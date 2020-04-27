@@ -22,7 +22,7 @@ function load_fresh() {
         var m = ("0" + time.getUTCMinutes()).slice(-2);
         var s = ("0" + time.getUTCSeconds()).slice(-2);
         var hms = h + ":" + m + ":" + s;
-        let url = "http://localhost/Temperature_System/backend/php/get_status.php";
+        let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
         RequestData(url, function (json) {
             var data = json;
             var online = data["data"]["online"];
@@ -44,7 +44,7 @@ function load_fresh() {
 
 function load_graph_data() {
 
-    let url = "http://localhost/Temperature_System/backend/php/get_status.php";
+    let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
         RequestData(url, function (json) {
         var data = json;
 

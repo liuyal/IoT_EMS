@@ -1,4 +1,4 @@
-import os, sys, threading, time, requests, random, argparse
+import os, sys, threading, time, requests, random, argparse, re
 from scapy.layers.inet import IP, UDP
 from scapy.sendrecv import send
 import socket as socket
@@ -45,10 +45,10 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
                 epoch = int(time.time())
                 temp = round(random.uniform(-10, 40), 2)
                 hum = round(random.uniform(0, 100), 2)
-                insert_req = "http://" + host_ip + "/Temperature_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-                if input_arg.http: response = requests.get(insert_req)
+                insert_req = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+                if input_arg.http: response = requests.get(insert_req).json()
                 msg = ("[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n")
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", " ") + str(response.json()) + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", " ") + str(response) + "\n")
             elif "ping" in str(data):
                 msg = ("[" + mac + "|pong|" + dst_ip + "|" + ip + "]\n")
                 sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
@@ -69,6 +69,18 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
             print(str(error))
 
 
+def mac_to_int(mac):
+    res = re.match('^((?:(?:[0-9a-f]{2}):){5}[0-9a-f]{2})$', mac.lower())
+    if res is None: raise ValueError('invalid mac address')
+    return int(res.group(0).replace(':', ''), 16)
+
+
+def int_to_mac(macint):
+    if type(macint) != int:
+        raise ValueError('invalid integer')
+    return ':'.join(['{}{}'.format(a, b) for a, b in zip(*[iter('{:012x}'.format(macint))] * 2)])
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
@@ -77,35 +89,48 @@ if __name__ == "__main__":
     parser.add_argument('-n', action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
 
-    print("\n" + str(input_arg))
-
     try:
         sys.argv[1]
     except:
-        parser.print_help();
+        parser.print_help()
+
+    HOST_IP = "192.168.1.80"
+    HOST_PORT = 9996
+    LOCAL_PORT = 9996
+    mode = ""
+    data = ""
+    mac_list = []
+    thread_list = []
+    n_nodes = int(input_arg.nodes)
+    condition = threading.Condition()
+
+    listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", LOCAL_PORT, 6000))
+    thread_list.append(listener)
 
     if input_arg.http == False and input_arg.sql == False:
         input_arg.http = True
         input_arg.sql = True
+        mode = "HTTP+SQL"
+    elif input_arg.http == True and input_arg.sql == False:
+        mode = "HTTP"
+    elif input_arg.http == False and input_arg.sql == True:
+        mode = "SQL"
 
-    data = ""
-    mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
-    n_nodes = int(input_arg.nodes)
-    condition = threading.Condition()
-    thread_list = []
-    listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", 9996, 6000))
-    thread_list.append(listener)
+    for i in range(1, n_nodes + 1): mac_list.append(int_to_mac(i))
 
-    print("\nStarting " + str(n_nodes) + " Dummy Nodes...")
+    print("\nStarting " + str(n_nodes) + " Dummy Nodes in " + mode + " mode...")
+
     for i in range(1, n_nodes + 1):
         # random.seed(i)
         # node_mac = rand_mac()
         node_mac = mac_list[i - 1]
         node_ip = "192.168.1." + str(i)
-        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, "192.168.1.80", 9996))
+        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, HOST_IP, HOST_PORT))
         thread_list.append(dummy_node_thread)
         print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip)
+
     try:
         for item in thread_list: item.start()
     except KeyboardInterrupt:
+        for item in thread_list: item.join()
         print("KeyboardInterrupt. Stopping script.")
