@@ -42,15 +42,53 @@ function load_fresh() {
 }
 
 
+
+
+
 function load_graph_data() {
 
     let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
-    RequestData(url, function (json) {
-        var data = json;
+    
+    RequestData(url, function (data) {
+        var packet = data;
+        console.log(packet)
+        
+        var ctx = document.getElementById("tempChart");
 
+        var myChart = new Chart(ctx, {
+            type: 'line',
 
-        console.log(data)
+            data: {
 
+                labels: [1, 2, 3, 4],
 
+                datasets: [{
+                        label: "Data",
+
+                        // Insert styling, colors etc here
+                        data: [
+                                {x: 1, y: 127},
+                                {x: 2, y: 140},
+                                {x: 3, y: 135},
+                                {x: 4, y: 122}
+                              ]
+                }]
+            }
+        });
+        
+        
+        
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+

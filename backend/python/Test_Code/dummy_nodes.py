@@ -1,4 +1,4 @@
-import os, sys, threading, time, requests, random, argparse, re
+import os, sys, threading, time, requests, random, argparse, re, datetime
 from scapy.layers.inet import IP, UDP
 from scapy.sendrecv import send
 import socket as socket
@@ -26,7 +26,8 @@ def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
             cv.acquire()
             cv.notifyAll()
             cv.release()
-            sys.stdout.write("[" + str(thread_id) + "] Packet: " + str(address) + "\t" + str(data) + "\n")
+            time_stamp = str(datetime.datetime.now().strftime("%H:%M:%S"))
+            sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Address: " + str(address) + "\tPacket: " + str(data) + "\n")
     except socket.timeout:
         sock.close()
 
@@ -41,7 +42,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
             cv.acquire()
             cv.wait()
             cv.release()
-            
+            time_stamp = str(datetime.datetime.now().strftime("%H:%M:%S"))
             if "fetch_data" in str(data):
                 epoch = int(time.time())
                 temp = round(random.uniform(-10, 40), 2)
@@ -49,19 +50,19 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
                 insert_req = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
                 if input_arg.http: response = requests.get(insert_req).json()
                 msg = ("[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n")
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", " ") + str(response) + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " " + msg.replace("\n", " ") + str(response) + "\n")
             elif "ping" in str(data):
                 msg = ("[" + mac + "|pong|" + dst_ip + "|" + ip + "]\n")
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " " + msg.replace("\n", "") + "\n")
             elif "reboot" in str(data):
                 msg = ("[" + mac + "|rebooting]\n")
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " " + msg.replace("\n", "") + "\n")
             elif "set_ip" in str(data):
                 start_index = str(data).index("|")
                 end_index = str(data).index("]")
                 dst_ip = str(data)[start_index + 1:end_index]
                 msg = "[" + mac + "|ip_set]\n"
-                sys.stdout.write("[" + str(thread_id) + "] " + msg.replace("\n", "") + "\n")
+                sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " " + msg.replace("\n", "") + "\n")
 
             packet = IP(src=ip, dst=dst_ip) / UDP(sport=port, dport=port) / msg
             if input_arg.sql: send(packet, verbose=False)
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         node_ip = "192.168.1." + str(i)
         dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, HOST_IP, HOST_PORT))
         thread_list.append(dummy_node_thread)
-        print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip)
+        print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip + "\n")
 
     try:
         for item in thread_list: item.start()

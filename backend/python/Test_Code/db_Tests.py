@@ -432,14 +432,14 @@ if __name__ == "__main__":
 
     db_reset()
 
-    for i in range(1, nodes + 1):
-        mac = int_to_mac(i)
-        mac_list.append(mac)
-        sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
-
-    add_nodes(mac_list)
-    set_display(mac_list, ip)
-    time_check_sql()
+    # for i in range(1, nodes + 1):
+    #     mac = int_to_mac(i)
+    #     mac_list.append(mac)
+    #     sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
+    #
+    # add_nodes(mac_list)
+    # set_display(mac_list, ip)
+    # time_check_sql()
 
 
     # sql_random_data_generator(mac_list[0:2], start_date, start_time, end_date, end_time, n_data)

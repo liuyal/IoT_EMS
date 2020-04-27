@@ -1,4 +1,16 @@
 <?php
+
+    function getUserIpAddr(){
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        return $ip;
+    }
+
     ini_set("display_errors","on");
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
@@ -44,6 +56,7 @@
 
     $find_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE mac='$mac';");
     $update_result = false;
+    $ip = getUserIpAddr();
 
     if ($find_mac && $find_mac->num_rows == 0) {
         $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, $time, true)");
