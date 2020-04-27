@@ -22,7 +22,7 @@ def thread(thread_id, connection, list, start, end):
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database) + ";")
     for i in range(start, end + 1):
-        # sys.stdout.write(str(thread_id) + " [" + str(i) + "] " + list[i] + "\n")
+        #sys.stdout.write(str(thread_id) + " [" + str(i) + "] " + list[i] + "\n")
         cursor.execute(list[i])
     connection.commit()
     connection.close()

@@ -12,7 +12,7 @@
         $table = $_GET["table"];
     }
     else {
-        $response["message"][0] = "Missing input parameters";
+        $response["message"][0] = "Parameter(s) are missing (table). Please check request";
         $response["success"] = 0;
         echo json_encode($response);
         exit;

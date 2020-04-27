@@ -23,14 +23,7 @@ def check_daily_avg(connection):
     cursor.execute("USE " + str(connection.database) + ";")
     cslog("Checking daily_avg table.")
     try:
-        cursor.execute("SHOW TABLES;")
-        result = cursor.fetchall()
-        found = False
-        for item in result:
-            if "daily_avg" in item[0]:
-                found = True
-        if not found:
-            cursor.execute("CREATE TABLE daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
+        cursor.execute("CREATE TABLE IF NOT EXISTS daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
         cursor.execute("SELECT mac, date FROM daily_avg;")
         result = cursor.fetchall()
         return result
@@ -38,7 +31,7 @@ def check_daily_avg(connection):
         cslog("Failure: " + str(e))
 
 
-def check_nova(connection):
+def check_tables(connection):
     cslog("Checking tables in nova.")
     cursor = connection.cursor()
     cursor.execute("USE " + str(connection.database) + ";")
@@ -72,7 +65,7 @@ def calc_daily_avg(avg_list, mac_list, connection):
         result = cursor.fetchall()
         avg_temp = round(result[0][0], 2)
         avg_hum = round(result[0][1], 2)
-        insert_avg_cmd = "INSERT INTO daily_avg (mac, date, avg_temp, avg_hum) VALUES('" + mac + "', " + str(item[1]) + ", " + str(avg_temp) + ", " + str(avg_hum) + ");"
+        insert_avg_cmd = "INSERT INTO daily_avg(mac, date, avg_temp, avg_hum) VALUES('" + mac + "', " + str(item[1]) + ", " + str(avg_temp) + ", " + str(avg_hum) + ");"
         cursor.execute(insert_avg_cmd)
     connection.commit()
 
@@ -105,7 +98,7 @@ if __name__ == "__main__":
         connection = mysql.connector.connect(host=mysql_cred["HOST"], database=mysql_cred["DATABASE"], user=mysql_cred["USER"], password=mysql_cred["PASSWORD"], auth_plugin='mysql_native_password')
 
         avg_list = check_daily_avg(connection)
-        mac_list = check_nova(connection)
+        mac_list = check_tables(connection)
         calc_daily_avg(avg_list, mac_list, connection)
         cslog("Closing DB connection")
         connection.close()

@@ -41,6 +41,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
             cv.acquire()
             cv.wait()
             cv.release()
+            
             if "fetch_data" in str(data):
                 epoch = int(time.time())
                 temp = round(random.uniform(-10, 40), 2)
@@ -99,8 +100,10 @@ if __name__ == "__main__":
     LOCAL_PORT = 9996
     mode = ""
     data = ""
+
     mac_list = []
     thread_list = []
+
     n_nodes = int(input_arg.nodes)
     condition = threading.Condition()
 

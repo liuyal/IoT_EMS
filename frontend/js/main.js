@@ -45,10 +45,10 @@ function load_fresh() {
 function load_graph_data() {
 
     let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
-        RequestData(url, function (json) {
+    RequestData(url, function (json) {
         var data = json;
 
-        
+
         console.log(data)
 
 

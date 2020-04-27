@@ -1,4 +1,4 @@
-import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading, cProfile, math
+import os, sys, time, datetime, requests, subprocess, serial, ipaddress, yaml, random, threading, cProfile, math, re
 from datetime import date, timedelta, timezone
 import mysql.connector
 from mysql.connector import Error
@@ -138,7 +138,7 @@ def get_last_time():
         cursor.execute("USE " + str(connection.database) + ";")
         cursor.execute("SELECT time FROM data ORDER BY time DESC;")
         data = cursor.fetchall()
-        epoch = int(data [0][0])
+        epoch = int(data[0][0])
         gm_time = time.gmtime(epoch)
         month = gm_time.tm_mon
         day = gm_time.tm_mday
@@ -404,35 +404,47 @@ def sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, threa
     print("")
 
 
+def mac_to_int(mac):
+    res = re.match('^((?:(?:[0-9a-f]{2}):){5}[0-9a-f]{2})$', mac.lower())
+    if res is None: raise ValueError('invalid mac address')
+    return int(res.group(0).replace(':', ''), 16)
+
+
+def int_to_mac(macint):
+    if type(macint) != int:
+        raise ValueError('invalid integer')
+    return ':'.join(['{}{}'.format(a, b) for a, b in zip(*[iter('{:012x}'.format(macint))] * 2)])
+
+
 if __name__ == "__main__":
 
     ip = "localhost"
-    mac_list = ["00:00:00:00:00:01", "00:00:00:00:00:02", "00:00:00:00:00:03", "00:00:00:00:00:04", "00:00:00:00:00:05"]
+    nodes = 2
+    mac_list = []
     n_threads = 200
-    n_data = 1
+    n_data = 50
 
     # start_date, start_time = get_last_time()
     # if start_date == 0: start_date, start_time = 20191231, "00:00"
-
-    start_date, start_time = 20200420, "00:00"
-    end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-",""))
+    start_date, start_time = 20200425, "00:00"
+    end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
     end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
 
     db_reset()
 
+    for i in range(1, nodes + 1):
+        mac = int_to_mac(i)
+        mac_list.append(mac)
+        sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
 
-    # sql_generator_wrapper("00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
-    # sql_generator_wrapper("00:00:00:00:00:02", start_date, start_time, end_date, end_time, n_threads)
-    # add_nodes(mac_list)
-    # set_display(mac_list[0:2], ip)
-    # time_check_sql()
+    add_nodes(mac_list)
+    set_display(mac_list, ip)
+    time_check_sql()
 
 
     # sql_random_data_generator(mac_list[0:2], start_date, start_time, end_date, end_time, n_data)
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
     # http_random_data_generator(mac_list, ip, start_date, start_time, end_date, end_time, n_data)
-
-
     # time_check_http(ip)
     # status_time_check_http(ip)
     # db_validate(ip)

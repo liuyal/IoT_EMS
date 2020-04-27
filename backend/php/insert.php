@@ -15,7 +15,7 @@
     } 
     else {
         $response["success"] = 0;
-        $response["message"][0] = "Parameter(s) are missing. Please check request";
+        $response["message"][0] = "Parameter(s) are missing (mac, time, temp, hum). Please check request";
         echo json_encode($response);
         exit;
     }
