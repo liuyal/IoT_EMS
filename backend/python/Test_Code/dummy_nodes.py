@@ -34,25 +34,24 @@ def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
 
 def response_handler(thread_id, time_stamp, src_ip, dst_ip, src_port, dst_port, udp_msg, http_request):
     response = ""
-    
     if input_arg.http and http_request != "": 
         response = requests.get(http_request).json()
         sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Request: " +http_request + "\n")
         sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Response: " + str(response) + "\n")
-    
-    if input_arg.sql: 
-        send(IP(src=src_ip, dst=dst_ip) / UDP(sport=src_port, dport=dst_port) / udp_msg, verbose=False)
+    if input_arg.udp:
+        send(IP(src=src_ip, dst=dst_ip) / UDP(sport=src_port, dport=int(dst_port)) / udp_msg, verbose=False)
         sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " " + udp_msg.replace("\n", " ") + "\n")
 
 
-def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996):
+def dummy_node(thread_id, cv, mac, local_ip="0.0.0.0", local_port=9996, host_ip="localhost", host_port=9996):
     global data
     dst_ip = host_ip
+    dst_port = host_port
     
     try:
-        udp_msg = ("[" + mac + "|on|" + ip + "]\n")
+        udp_msg = ("[" + mac + "|on|" + local_ip + "]\n")
         http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_status_check.php?mac=" + mac + "&state=on"
-        response_handler(thread_id, str(datetime.datetime.now().strftime("%H:%M:%S")), ip, host_ip, port, port, udp_msg, http_request)
+        response_handler(thread_id, str(datetime.datetime.now().strftime("%H:%M:%S")), local_ip, host_ip, local_port, dst_port, udp_msg, http_request)
     except Exception as error:
         print(str(error))
 
@@ -68,25 +67,26 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
                 hum = round(random.uniform(0, 100), 2)
                 udp_msg = "[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n"
                 http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_insert_data.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
-                response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, http_request)
+                response_handler(thread_id, time_stamp, local_ip, dst_ip, local_port, dst_port, udp_msg, http_request)
 
             elif "ping" in str(data):
-                udp_msg = "[" + mac + "|pong|" + dst_ip + "|" + ip + "]\n"
+                udp_msg = "[" + mac + "|pong|" + dst_ip + "|" + local_ip + "]\n"
                 http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_status_check.php?mac=" + mac + "&state=pong"
-                response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, http_request)
+                response_handler(thread_id, time_stamp, local_ip, dst_ip, local_port, dst_port, udp_msg, http_request)
 
             elif "reboot" in str(data):
                 udp_msg = "[" + mac + "|rebooting]\n"
-                response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, "")
+                response_handler(thread_id, time_stamp, local_ip, dst_ip, local_port, dst_port, udp_msg, "")
                 time.sleep(2)
-                udp_msg = "[" + mac + "|on|" + ip + "]\n"
+                udp_msg = "[" + mac + "|on|" + local_ip + "]\n"
                 http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_status_check.php?mac=" + mac + "&state=on"
-                response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, http_request)
+                response_handler(thread_id, time_stamp, local_ip, dst_ip, local_port, dst_port, udp_msg, http_request)
 
-            elif "set_ip" in str(data):
-                dst_ip = str(data)[str(data).index("|") + 1:str(data).index("]")]
-                udp_msg = "[" + mac + "|ip_set|" + dst_ip + "]\n"
-                response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, "")
+            elif "set_host" in str(data):
+                dst_ip = str(data)[str(data).index("|") + 1:str(data).index(":")]
+                dst_port = str(data)[str(data).index(":") + 1:str(data).index("]")]
+                udp_msg = "[" + mac + "|host_set|" + dst_ip + ":" + dst_port + "]\n"
+                response_handler(thread_id, time_stamp, local_ip, dst_ip, local_port, dst_port, udp_msg, "")
 
         except Exception as error:
             print(str(error))
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-http', action='store_true', dest="http", default=False, help='HTTP mode')
-    parser.add_argument('-sql', action='store_true', dest="sql", default=False, help='SQL mode')
+    parser.add_argument('-u', "--UDP", action='store_true', dest="udp", default=False, help='UDP mode')
     parser.add_argument('-n', action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
 
@@ -132,14 +132,14 @@ if __name__ == "__main__":
     listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", LOCAL_PORT, 6000))
     thread_list.append(listener)
 
-    if input_arg.http == False and input_arg.sql == False:
+    if input_arg.http == False and input_arg.udp == False:
         input_arg.http = True
-        input_arg.sql = True
-        mode = "HTTP+SQL"
-    elif input_arg.http == True and input_arg.sql == False:
+        input_arg.udp = True
+        mode = "HTTP+UDP"
+    elif input_arg.http == True and input_arg.udp == False:
         mode = "HTTP"
-    elif input_arg.http == False and input_arg.sql == True:
-        mode = "SQL"
+    elif input_arg.http == False and input_arg.udp == True:
+        mode = "UDP"
 
     for i in range(1, n_nodes + 1): mac_list.append(int_to_mac(i))
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         # node_mac = rand_mac()
         node_mac = mac_list[i - 1]
         node_ip = "192.168.1." + str(i)
-        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, HOST_IP, HOST_PORT))
+        dummy_node_thread = threading.Thread(target=dummy_node, args=(i, condition, node_mac, node_ip, LOCAL_PORT, HOST_IP, HOST_PORT))
         thread_list.append(dummy_node_thread)
         print("Node [" + str(i) + "]: " + node_mac + "|" + node_ip)
     print("")
