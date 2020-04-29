@@ -34,9 +34,9 @@ def udp_listener(thread_id, cv, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
 
 def response_handler(thread_id, time_stamp, src_ip, dst_ip, src_port, dst_port, udp_msg, http_request):
     response = ""
-    if input_arg.http and http_request != "": 
+    if input_arg.http and http_request != "":
         response = requests.get(http_request).json()
-        sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Request: " +http_request + "\n")
+        sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Request: " + http_request + "\n")
         sys.stdout.write("[" + str(thread_id) + "] " + time_stamp + " Response: " + str(response) + "\n")
     if input_arg.udp:
         send(IP(src=src_ip, dst=dst_ip) / UDP(sport=src_port, dport=int(dst_port)) / udp_msg, verbose=False)
@@ -47,7 +47,7 @@ def dummy_node(thread_id, cv, mac, local_ip="0.0.0.0", local_port=9996, host_ip=
     global data
     dst_ip = host_ip
     dst_port = host_port
-    
+
     try:
         udp_msg = ("[" + mac + "|on|" + local_ip + "]\n")
         http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_status_check.php?mac=" + mac + "&state=on"
@@ -109,7 +109,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-http', action='store_true', dest="http", default=False, help='HTTP mode')
     parser.add_argument('-u', "--UDP", action='store_true', dest="udp", default=False, help='UDP mode')
-    parser.add_argument('-n', action='store', dest="nodes", default=5, help='Verbose mode')
+    parser.add_argument("-p", "--PORT", action='store', type=int, dest="LOCAL_PORT", default=9996, help='Node(s) Listen Port')
+    parser.add_argument('-n', "--NODES", action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
 
     try:
@@ -126,11 +127,15 @@ if __name__ == "__main__":
     mac_list = []
     thread_list = []
 
-    n_nodes = int(input_arg.nodes)
-    condition = threading.Condition()
-
-    listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", LOCAL_PORT, 6000))
-    thread_list.append(listener)
+    if input_arg.LOCAL_PORT == None:
+        LOCAL_PORT = 9996
+    else:
+        try:
+            LOCAL_PORT = int(input_arg.LOCAL_PORT)
+            if LOCAL_PORT < 0 or LOCAL_PORT > 65535: raise Exception("Invalid Port")
+        except:
+            print("Invalid IP, using Default: 9996")
+            LOCAL_PORT = 9996
 
     if input_arg.http == False and input_arg.udp == False:
         input_arg.http = True
@@ -141,8 +146,12 @@ if __name__ == "__main__":
     elif input_arg.http == False and input_arg.udp == True:
         mode = "UDP"
 
-    for i in range(1, n_nodes + 1): mac_list.append(int_to_mac(i))
+    n_nodes = int(input_arg.nodes)
+    condition = threading.Condition()
+    listener = threading.Thread(target=udp_listener, args=(0, condition, "0.0.0.0", LOCAL_PORT, 6000))
+    thread_list.append(listener)
 
+    for i in range(1, n_nodes + 1): mac_list.append(int_to_mac(i))
     print("\nStarting " + str(n_nodes) + " Dummy Nodes in " + mode + " mode...")
 
     for i in range(1, n_nodes + 1):

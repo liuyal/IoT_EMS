@@ -147,6 +147,8 @@ if __name__ == "__main__":
         parser.print_usage()
         sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP))
 
+
+
     cmd = []
     cslog("Started UDP Command Handler")
     if input_arg.fetch: cmd.append(b"[fetch_data]\n")
