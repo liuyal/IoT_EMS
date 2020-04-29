@@ -11,6 +11,7 @@
         return $ip;
     }
 
+    // TODO: Handle days
     function timeConvert($delta) {
         if ($delta < 2) {
             $return_time =  gmdate("H:i:s", $delta) . " second";

@@ -22,7 +22,11 @@
     if (isset($_GET["table"])) { $table = $_GET["table"]; } 
     else { $table = "data"; }
 
-    $result = mysqli_query($connect, "SELECT * FROM $table;");
+    if (strstr($table, "data")) {
+        $result = mysqli_query($connect, "SELECT * FROM $table ORDER BY time ASC;");
+    } else {
+        $result = mysqli_query($connect, "SELECT * FROM $table;");
+    }
 
     if ($result && mysqli_num_rows($result) > 0 && strstr($table, "data")) {
         $response["data"] = array();
