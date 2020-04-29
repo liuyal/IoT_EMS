@@ -426,8 +426,8 @@ if __name__ == "__main__":
 
     # start_date, start_time = get_last_time()
     # if start_date == 0: start_date, start_time = 20191231, "00:00"
-    start_date, start_time = 20200425, "21:00"
-    end_date, end_time = 20200426, "00:30"
+    start_date, start_time = 20200427, "21:00"
+    end_date, end_time = 20200429, "00:30"
 
     # end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
     # end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
