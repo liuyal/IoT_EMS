@@ -424,13 +424,12 @@ if __name__ == "__main__":
     n_threads = 200
     n_data = 50
 
-    # start_date, start_time = get_last_time()
-    # if start_date == 0: start_date, start_time = 20191231, "00:00"
-    start_date, start_time = 20200427, "21:00"
-    end_date, end_time = 20200429, "00:30"
+    start_date, start_time = get_last_time()
+    if start_date == 0: start_date, start_time = 20191231, "00:00"
+    start_date, start_time = 20200428, "21:00"
 
-    # end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
-    # end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
+    end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
+    end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
 
     db_reset()
 
@@ -438,15 +437,17 @@ if __name__ == "__main__":
         mac = int_to_mac(i)
         mac_list.append(mac)
         sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
-    #
+
+
     # add_nodes(mac_list)
     # set_display(mac_list, ip)
-    # time_check_sql()
 
+    # time_check_sql()
 
     # sql_random_data_generator(mac_list[0:2], start_date, start_time, end_date, end_time, n_data)
     # http_generator_wrapper("localhost", "00:00:00:00:00:01", start_date, start_time, end_date, end_time, n_threads)
     # http_random_data_generator(mac_list, ip, start_date, start_time, end_date, end_time, n_data)
+
     # time_check_http(ip)
     # status_time_check_http(ip)
     # db_validate(ip)

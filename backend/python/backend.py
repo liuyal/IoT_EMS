@@ -66,12 +66,26 @@ def udp_listener(msg_queue, UDP_IP="0.0.0.0", UDP_PORT=9996, time_out=5):
     msg_queue.put(mac_list)
 
 
-def sql_node_status_update(mac_list, connection):
+def sql_node_status_update(update_list, on_list, connection):
     try:
         cursor = connection.cursor()
         cursor.execute("USE " + str(connection.database) + ";")
-        for item in mac_list:
 
+        for item in on_list:
+            search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
+            cursor.execute(search_cmd)
+            result = cursor.fetchall()
+            if len(result) < 1:
+                add_node = "INSERT INTO nodes(mac, ip, port, start_time, time_stamp, status)"
+                values = "VALUES('" + str(item["mac"]) + "', '" + item["ip"] + "', " + str(item["port"]) + ", " + str(item["time"]) + ", " + str(item["time"]) + ", TRUE)"
+                cursor.execute(add_node + values)
+                cslog("Added node " + item["mac"] + " to status table.")
+            else:
+                update_cmd = "UPDATE nodes SET start_time=" + str(item["time"]) + ",time_stamp=" + str(item["time"]) + ",ip='" + item["ip"] + "',port=" + str(item["port"]) + ",status=true WHERE mac='" + item["mac"] + "';"
+                cursor.execute(update_cmd)
+                cslog("Node " + item["mac"] + " Online.")
+
+        for item in update_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)
             result = cursor.fetchall()
@@ -84,6 +98,7 @@ def sql_node_status_update(mac_list, connection):
                 update_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
                 cursor.execute(update_cmd)
                 cslog("Updated node " + item["mac"] + " status.")
+
         connection.commit()
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
@@ -115,8 +130,8 @@ def node_cmd_handler():
     cslog("Started UDP Command Handler")
     if input_arg.fetch: cmd.append(b"[fetch_data]\n")
     if input_arg.ping: cmd.append(b"[ping]\n")
+    if input_arg.set_host != None: cmd.append(("[set_host|" + str(input_arg.set_host) + "]\n").encode('utf8'))
     if input_arg.reboot: cmd.append(b"[reboot]\n")
-    if input_arg.set_host != None: cmd.append(("[set_host|" + str(input_arg.HOST_IP) + "]\n").encode('utf8'))
 
     if input_arg.NODE_IP.split('.')[-1] == "255":
         thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
@@ -135,15 +150,31 @@ def node_cmd_handler():
         db_connection = SQL_connection_handler()
         msg_list = msg_queue.get()
         mac_list = (list(set(msg_queue.get())))
+
+        insert_list = []
+        on_list = []
         update_list = []
-        for mac in mac_list:
-            for item in reversed(msg_list):
-                if mac == item["mac"]:
-                    update_list.append(item)
+
+        for node in mac_list:
+            for msg in reversed(msg_list):
+                if node == msg["mac"] and "data_sent" in str(msg["data"]):
+                    insert_list.append(msg)
+                    msg_list.remove(msg)
+
+        for node in mac_list:
+            for msg in reversed(msg_list):
+                if node == msg["mac"] and "reboot" not in str(msg["data"]):
+                    update_list.append(msg)
                     break
-        # TODO: handel ping, reboot, setip cmds
-        sql_node_status_update(update_list, db_connection)
-        sql_insert(msg_list, db_connection)
+
+        for node in mac_list:
+            for msg in reversed(msg_list):
+                if node == msg["mac"] and "|on|" in str(msg["data"]):
+                    on_list.append(msg)
+                    break
+
+        sql_node_status_update(update_list, on_list, db_connection)
+        sql_insert(insert_list, db_connection)
         SQL_disconnection_handler(db_connection)
 
 
@@ -257,7 +288,7 @@ def sql_cmd_maker(connection):
     return insert_list, remove_list
 
 
-def back_up():
+def backup_daily_data():
     db_connection = SQL_connection_handler()
     insert_list, remove_list = sql_cmd_maker(db_connection)
     SQL_disconnection_handler(db_connection)
@@ -433,16 +464,10 @@ if __name__ == "__main__":
 
     log_path = os.getcwd() + os.sep + datetime.datetime.now().strftime("%y%m%d") + "_appServer.log"
     if input_arg.log: logging.basicConfig(filename=log_path, filemode='a', format='%(asctime)s, %(name)s, [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG)
-
     if input_arg.fetch or input_arg.ping or input_arg.reboot or input_arg.set_host != None: node_cmd_handler()
-
     if input_arg.node_status: check_node_status()
-
-    if input_arg.backup: back_up()
-
+    if input_arg.backup: backup_daily_data()
     if input_arg.average: calc_daily_avg()
-
     if input_arg.reset_db: reset_db()
-
-    logging.shutdown()
     if platform.system() == "linux" or platform.system() == "linux2": os.system("sudo apt-get clean")
+    if input_arg.log: logging.shutdown()
