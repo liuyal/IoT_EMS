@@ -19,18 +19,6 @@
     $filepath = realpath (dirname(__FILE__));
     require_once($filepath."/dbconfig.php");
 
-    if (isset($_GET["mac"]) && isset($_GET["time"]) && isset($_GET["temp"]) && isset($_GET["hum"])) {
-        $mac = $_GET["mac"];
-        $time = $_GET["time"];
-        $temp = $_GET["temp"];
-        $hum = $_GET["hum"];
-    } else {
-        $response["success"] = 0;
-        $response["message"][0] = "Parameter(s) are missing (mac, time, temp, hum). Please check request";
-        echo json_encode($response);
-        exit;
-    }
-
     $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
     $db = mysqli_select_db($connect, DB_DATABASE);
 
@@ -39,6 +27,18 @@
     } else {
         $response["success"] = 0;
         $response["message"][0] = "Server Connection failed";
+        echo json_encode($response);
+        exit;
+    }
+
+    if (isset($_GET["mac"]) && isset($_GET["time"]) && isset($_GET["temp"]) && isset($_GET["hum"])) {
+        $mac = $_GET["mac"];
+        $time = $_GET["time"];
+        $temp = $_GET["temp"];
+        $hum = $_GET["hum"];
+    } else {
+        $response["success"] = 0;
+        $response["message"][0] = "Parameter(s) are missing (mac, time, temp, hum). Please check request";
         echo json_encode($response);
         exit;
     }
@@ -56,7 +56,7 @@
     $ip = getUserIpAddr();
 
     if ($find_mac && $find_mac->num_rows == 0) {
-        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, $time, true)");
+        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '$ip', 0, $time, true)");
     } else if ($find_mac) {
         $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
     }

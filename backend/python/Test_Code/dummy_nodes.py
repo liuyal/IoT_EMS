@@ -67,7 +67,7 @@ def dummy_node(thread_id, cv, mac, ip="0.0.0.0", host_ip="localhost", port=9996)
                 temp = round(random.uniform(-10, 40), 2)
                 hum = round(random.uniform(0, 100), 2)
                 udp_msg = "[" + mac + "|data_sent|" + str(epoch) + "|" + str(temp) + "|" + str(hum) + "]\n"
-                http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+                http_request = "http://" + host_ip + "/IoT_Environment_Monitor_System/backend/php/node_insert_data.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
                 response_handler(thread_id, time_stamp, ip, dst_ip, port, port, udp_msg, http_request)
 
             elif "ping" in str(data):

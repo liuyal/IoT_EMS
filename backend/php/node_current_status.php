@@ -32,11 +32,11 @@
         echo json_encode($response);
         exit;
     }
-    
+
+    $limit = 60;
     $history = false;
     $counter = 0;
-    $limit = 60;
-
+    
     while ($row = mysqli_fetch_array($get_mac)) {
         
         $mac = $row["mac"];
@@ -50,12 +50,14 @@
             $response["data"][$counter]["last_hum"] = $data[0][3];
             $response["data"][$counter]["history"] = $data;
         } else if ($history && count($data) > 0 && count($data) < $limit) {
+           
             $missing = $limit - count($data);
             $epoch = intval($data[count($data) - 1][1]) - 86000;
             $dt = new DateTime("@$epoch");
             $table = $dt->format("Ymd") . "_data";
 
             $history2 = mysqli_query($connect, "SELECT mac, time, temp, hum FROM $table WHERE mac='$mac' ORDER BY time DESC LIMIT $missing;");
+            
             if ($history2) {
                 $data2 = mysqli_fetch_all($history2);
                 $response["message"][$counter + 1] = "Fresh data found for $mac";

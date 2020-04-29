@@ -8,25 +8,23 @@
     require_once($filepath."/dbconfig.php");
     $db_name = DB_DATABASE;
 
-    if (isset($_GET["table"])) {
-        $table = $_GET["table"];
-    }
-    else {
-        $response["message"][0] = "Parameter(s) are missing (table). Please check request";
-        $response["success"] = 0;
-        echo json_encode($response);
-        exit;
-    }
-
     $connect = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD);
     $db = mysqli_select_db($connect, DB_DATABASE);
 
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
-    }
-    else {
+    } else {
         $response["success"] = 0;
         $response["message"][0] = "Server Connection failed";
+        echo json_encode($response);
+        exit;
+    }
+
+    if (isset($_GET["table"])) {
+        $table = $_GET["table"];
+    } else {
+        $response["message"][0] = "Parameter(s) are missing (table). Please check request";
+        $response["success"] = 0;
         echo json_encode($response);
         exit;
     }
@@ -54,20 +52,18 @@
 
         if ($result3) { $response["message"][5] = "system_config Table created successfully"; }
         else { $response["message"][5] = "ERROR: DB failed to create system_config table"; }
-
+        
         if ($result4) { $response["message"][6] = "daily_avg Table created successfully"; }
         else { $response["message"][6] = "ERROR: DB failed to create daily_avg table"; }
 
         if ($result1 && $result2 && $result3 && $result4) {
             $response["success"] = 1;
-            $response["message"][7] = "DB reset successfully complete";
-        }
-        else {
+            $response["message"][7] = "DataBase $table reset successfully complete";
+        } else {
             $response["success"] = 0;
-            $response["message"][7] = "ERROR: DB reset failed";
+            $response["message"][7] = "ERROR: DataBase $table reset failed";
         }
-    }
-    else {
+    } else {
         $result_T = mysqli_query($connect, "TRUNCATE TABLE $table");
         if ($result_T) {
             $response["success"] = 1;

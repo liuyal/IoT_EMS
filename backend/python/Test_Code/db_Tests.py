@@ -419,23 +419,25 @@ def int_to_mac(macint):
 if __name__ == "__main__":
 
     ip = "localhost"
-    nodes = 2
+    nodes = 1
     mac_list = []
     n_threads = 200
     n_data = 50
 
     # start_date, start_time = get_last_time()
     # if start_date == 0: start_date, start_time = 20191231, "00:00"
-    start_date, start_time = 20200425, "00:00"
-    end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
-    end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
+    start_date, start_time = 20200425, "21:00"
+    end_date, end_time = 20200426, "00:30"
+
+    # end_date = int(str(datetime.datetime.utcnow()).split(" ")[0].replace("-", ""))
+    # end_time = str(datetime.datetime.utcnow()).split(" ")[1].split(".")[0][0:5]
 
     db_reset()
 
-    # for i in range(1, nodes + 1):
-    #     mac = int_to_mac(i)
-    #     mac_list.append(mac)
-    #     sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
+    for i in range(1, nodes + 1):
+        mac = int_to_mac(i)
+        mac_list.append(mac)
+        sql_generator_wrapper(mac, start_date, start_time, end_date, end_time, n_threads)
     #
     # add_nodes(mac_list)
     # set_display(mac_list, ip)

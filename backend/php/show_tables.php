@@ -12,8 +12,7 @@
 
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
-    }
-    else {
+    } else {
         $response["success"] = 0;
         $response["message"][0] = "Server Connection failed";
         echo json_encode($response);
@@ -31,8 +30,7 @@
         }
         $response["success"] = 1;
         $response["message"][1] = "Tables found successfully";
-    }	
-    else {
+    } else {
     	$response["success"] = 0;
         $response["message"][1] = "Empty database, no tables found";
     }
