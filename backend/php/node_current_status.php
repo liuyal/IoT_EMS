@@ -12,8 +12,7 @@
 
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
-    }
-    else {
+    } else {
         $response["success"] = 0;
         $response["message"][0] = "Server Connection failed";
         echo json_encode($response);
@@ -29,7 +28,7 @@
     $get_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE display=true;");
     if ($get_mac->num_rows == 0) {
         $response["success"] = 0;
-        $response["message"][1] = "Nodes table empty";
+        $response["message"][1] = "No Nodes to Display";
         echo json_encode($response);
         exit;
     }
@@ -50,8 +49,7 @@
             $response["data"][$counter]["last_temp"] = $data[0][2];
             $response["data"][$counter]["last_hum"] = $data[0][3];
             $response["data"][$counter]["history"] = $data;
-        }
-        else if ($history && count($data) > 0 && count($data) < $limit) {
+        } else if ($history && count($data) > 0 && count($data) < $limit) {
             $missing = $limit - count($data);
             $epoch = intval($data[count($data) - 1][1]) - 86000;
             $dt = new DateTime("@$epoch");
@@ -65,8 +63,7 @@
                 $response["data"][$counter]["last_temp"] = $data[0][2];
                 $response["data"][$counter]["last_hum"] = $data[0][3];
                 $response["data"][$counter]["history"] = array_merge($data, $data2);
-            }
-            else {
+            } else {
                 $response["message"][$counter + 1] = "Fresh data found for $mac, (<1H)";
                 $response["data"][$counter]["mac"] = $mac;
                 $response["data"][$counter]["last_temp"] = $data[0][2];
@@ -74,8 +71,7 @@
                 $response["data"][$counter]["history"] = $data;
             }
 
-        }   
-        else {
+        } else {
             $response["message"][$counter + 1] = "No data found for $mac";
             $response["data"][$counter]["mac"] = $mac;
             $response["data"][$counter]["last_temp"] = 0;
@@ -87,8 +83,7 @@
 
     if ($history && $check_online) {
         $response["success"] = 1;
-    }
-    else {
+    } else {
         $response["success"] = 0;
     }
     

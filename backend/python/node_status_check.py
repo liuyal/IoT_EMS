@@ -31,7 +31,9 @@ def check_node_status(connection, timeout):
             last_node_time = item[1]
             delta_seconds = current_time - last_node_time
             if delta_seconds > timeout:
-                if int(delta_seconds) < 60:
+                if int(delta_seconds) < 2:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " second"
+                elif int(delta_seconds) < 60:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
                 elif int(delta_seconds / 60) == 1:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
@@ -42,11 +44,13 @@ def check_node_status(connection, timeout):
                 else:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
                 cslog("Node: " + item[0] + " last seen " + time_info + " ago. Updating status to offline.")
-                update_status_sql = "UPDATE nodes SET status=false WHERE mac='" + item[0] + "';"
+                update_status_sql = "UPDATE nodes SET start_time=0, status=false WHERE mac='" + item[0] + "';"
                 cursor.execute(update_status_sql)
                 connection.commit()
             else:
-                if int(delta_seconds) < 60:
+                if int(delta_seconds) < 2:
+                    time_info = str(datetime.timedelta(seconds=delta_seconds)) + " second"
+                elif int(delta_seconds) < 60:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
                 elif int(delta_seconds / 60) == 1:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
@@ -56,7 +60,10 @@ def check_node_status(connection, timeout):
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
                 else:
                     time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
-                cslog("Node: " + item[0] + " last seen " + time_info + " ago.")
+                cslog("Node: " + item[0] + " last seen " + time_info + " ago. Status Online.")
+                update_status_sql = "UPDATE nodes SET status=true WHERE mac='" + item[0] + "';"
+                cursor.execute(update_status_sql)
+                connection.commit()
 
 
 if __name__ == "__main__":

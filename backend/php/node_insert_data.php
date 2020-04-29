@@ -24,8 +24,7 @@
         $time = $_GET["time"];
         $temp = $_GET["temp"];
         $hum = $_GET["hum"];
-    } 
-    else {
+    } else {
         $response["success"] = 0;
         $response["message"][0] = "Parameter(s) are missing (mac, time, temp, hum). Please check request";
         echo json_encode($response);
@@ -37,8 +36,7 @@
 
     if ($db) {
         $response["message"][0] = "Server Connected successfully";
-    }
-    else {
+    } else {
         $response["success"] = 0;
         $response["message"][0] = "Server Connection failed";
         echo json_encode($response);
@@ -49,8 +47,7 @@
     
     if ($insert_result) { 
         $response["message"][1] = "Data successfully inserted"; 
-    } 
-    else { 
+    } else { 
         $response["message"][1] = "Data failed to insert"; 
     }
 
@@ -60,22 +57,19 @@
 
     if ($find_mac && $find_mac->num_rows == 0) {
         $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '0.0.0.0', 0, $time, true)");
-    }
-    else if ($find_mac) {
+    } else if ($find_mac) {
         $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
     }
 
     if ($update_result) { 
         $response["message"][2] = "Node:'$mac' status updated"; 
-    }
-    else { 
+    } else { 
         $response["message"][2] = "Node:'$mac' failed to update status"; 
     }
 
     if ($insert_result && $update_result) {
         $response["success"] = 1;
-    }
-    else {
+    } else {
         $response["success"] = 0;
     }
     
