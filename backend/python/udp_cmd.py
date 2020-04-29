@@ -85,7 +85,7 @@ def update_node_db_status(update_list, connection):
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
 
-
+# TOD0: handle all cmd msgs
 def insert_data(data, connection):
     try:
         cslog("Inserting data into database")

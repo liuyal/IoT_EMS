@@ -67,7 +67,7 @@ String get_data() {
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    String http_insert = "http://" + hostIP.toString() + "/IoT_Environment_Monitor_System/backend/php/insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
+    String http_insert = "http://" + hostIP.toString() + "/IoT_Environment_Monitor_System/backend/php/node_insert.php?" + "mac=" + MAC + "&time=" + (String)time_stamp + "&temp=" + (String)temp + "&hum=" + (String)hum;
     return_data = (String)time_stamp + "|" + (String)temp + "|" + (String)hum;
     Serial_Print(http_insert + "\r\n");
     http.begin(http_insert);

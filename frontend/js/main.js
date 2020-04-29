@@ -64,7 +64,7 @@ function load_graph_data() {
 
                 datasets: [{
                         label: "Data",
-
+                        backgroundColor: "#e755ba",
                         // Insert styling, colors etc here
                         data: [
                                 {x: 1, y: 127},

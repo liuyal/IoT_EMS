@@ -117,7 +117,7 @@ def db_reset():
         cursor.execute("USE " + str(mysql_cred["DATABASE"]) + ";")
 
         cursor.execute("CREATE TABLE IF NOT EXISTS data(id INT NOT NULL AUTO_INCREMENT, mac VARCHAR(17), time BIGINT, temp DECIMAL (18, 2), hum DECIMAL (18, 2), PRIMARY KEY (id));")
-        cursor.execute("CREATE Table IF NOT EXISTS nodes(mac VARCHAR(17), ip CHAR(39), port INT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
+        cursor.execute("CREATE Table IF NOT EXISTS nodes(mac VARCHAR(17), ip CHAR(39), port INT, start_time BIGINT, time_stamp BIGINT, status boolean, display boolean DEFAULT False, PRIMARY KEY (mac));")
         cursor.execute("CREATE Table IF NOT EXISTS system_config(host_ip CHAR(39), host_port INT);")
         cursor.execute("CREATE TABLE IF NOT EXISTS daily_avg(mac VARCHAR(17), date BIGINT, avg_temp DECIMAL (18, 2), avg_hum DECIMAL (18, 2), PRIMARY KEY (mac, date));")
         connection.commit()
@@ -267,7 +267,7 @@ def http_random_data_generator(mac_list, ip, start_date, start_time, end_date, e
         epoch = random.randint(epoch_start, epoch_end)
         temp = round(random.uniform(-10, 50), 2)
         hum = round(random.uniform(0, 100), 2)
-        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/node_insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
         sys.stdout.write("[" + str(i) + "]" + time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
 
@@ -277,7 +277,7 @@ def http_data_generator(ip, mac, start, end):
     while epoch < int(end):
         temp = round(random.uniform(-10, 50), 2)
         hum = round(random.uniform(0, 100), 2)
-        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
+        insert_req = "http://" + ip + "/IoT_Environment_Monitor_System/backend/php/node_insert.php?mac=" + mac + "&time=" + str(epoch) + "&temp=" + str(temp) + "&hum=" + str(hum)
         response = requests.get(insert_req)
         sys.stdout.write(time.strftime('%Y%m%d %H:%M:%S', time.gmtime(epoch)) + " " + str(epoch) + " " + str(temp) + " " + str(hum) + "\n" + insert_req + "\n" + str(response.json()) + "\n")
         epoch = epoch + 60
