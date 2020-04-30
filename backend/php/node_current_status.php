@@ -22,8 +22,8 @@
     $check_online = mysqli_query($connect, "SELECT COUNT(*) as count FROM nodes WHERE status=true;");
     $n_online = mysqli_fetch_assoc($check_online);
 
-    if ($check_online) { $response["data"]["online"] = $n_online["count"]; }
-    else { $response["data"]["online"] = 0; }
+    if ($check_online) { $response["online"] = $n_online["count"]; }
+    else { $response["online"] = 0; }
 
     $get_mac = mysqli_query($connect, "SELECT mac FROM nodes WHERE display=true;");
     if ($get_mac->num_rows == 0) {

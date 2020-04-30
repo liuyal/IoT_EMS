@@ -25,7 +25,7 @@ function load_fresh() {
         let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/node_current_status.php";
         RequestData(url, function (json) {
             var data = json;
-            var online = data["data"]["online"];
+            var online = data["online"];
             var temp = data["data"][0]["last_temp"];
             var hum = data["data"][0]["last_hum"];
             document.getElementById('n_online').innerHTML = online;

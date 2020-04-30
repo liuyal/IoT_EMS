@@ -149,6 +149,7 @@
                 } else {
                     
                     $start_delta = $current_time - $start_time;
+                    
                     $time_info = secondsToTime($delta) . timeConvert($delta);
                     $up_time = secondsToTime($start_delta) . timeConvert($start_delta);
                     $update_status = mysqli_query($connect, "UPDATE nodes SET status=true WHERE mac='$mac';");
