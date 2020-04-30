@@ -38,10 +38,8 @@
 
 .main-status {
     display: grid;
-    height: 17%;
     grid-gap: 10px;
     margin: 10px 10px;
-
 }
 
 .overviewcard {
@@ -152,7 +150,6 @@
 
 .main-cards {
     display: grid;
-    height: 60%;
     grid-gap: 10px;
     margin: 10px 10px;
 }
@@ -183,8 +180,6 @@
 .footer-cards {
     font-family: 'Montserrat', sans-serif;
     display: grid;
-
-    height: 15%;
     grid-gap: 10px;
     margin: 10px 10px;
     color: wheat
@@ -207,58 +202,70 @@
 ----------------------------------------------------- */
 
 @media only screen and (min-width: 1225px) {
-    .main-status {
-        grid-template-columns: repeat(4, minmax(265px, 1fr));
+
+    .main-header {
+        height: 49px;
     }
 
-    .main-cards {}
+    .main-status {
+        grid-template-columns: repeat(4, minmax(265px, 1fr));
+        height: 18%;
+        min-height: 150px;
+    }
+
+    .main-cards {
+        height: 58%;
+        min-height: 400px;
+    }
 
     .footer-cards {
         grid-template-columns: repeat(4, minmax(265px, 1fr));
+        height: 12%;
+        min-height: 150px;
     }
 }
 
 
 @media only screen and (min-width: 930px) and (max-width: 1225px) {
+
+    .main-header {
+        height: 49px;
+
+    }
+
     .main-status {
         grid-template-columns: repeat(2, minmax(265px, 1fr));
-        height: 40%;
+        height: 300px;
     }
 
     .main-cards {
-        height: 90%;
+        height: 550px;
     }
 
     .footer-cards {
         grid-template-columns: repeat(2, minmax(265px, 1fr));
-        height: 30%;
+        height: 150px;
     }
 }
 
 
 @media only screen and (max-width: 930px) {
+    .main-header {
+        height: 49px;
+    }
+
     .main-status {
-        grid-template-columns: repeat(1, minmax(265px, 1fr));
-        height: 60%;
+        grid-template-columns: repeat(1, minmax(165px, 1fr));
+        height: 600px;
     }
-
-    .overviewcard {
-        border-bottom: 10px solid rgb(255, 255, 255, 0.5);
-        filter: brightness(100%);
-    }
-
-    .overviewcard:hover {
-        filter: brightness(110%);
-    }
-
 
     .main-cards {
-        height: 80%;
+        height: 800px;
     }
 
 
     .footer-cards {
         grid-template-columns: repeat(1, minmax(265px, 1fr));
-        height: 60%
+        height: 550px;
     }
 }
