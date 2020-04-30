@@ -1,14 +1,18 @@
 .main {
     grid-area: main;
-    background-color: rgb(37, 41, 46);
-    margin-left: 140px;
-    transition-duration: 0.3s;
 }
 
-.main.collapsed {
+
+.main_wrapper {
     transition-duration: 0.3s;
-    margin-left: calc(140px - 96px);
+    height: 100%;
+    margin-bottom: 0px;
 }
+
+.main_wrapper.collapsed {
+    margin-left: -95px;
+}
+
 
 /* ---------------------------------------------------
     Header
@@ -16,15 +20,15 @@
 
 .main-header {
     display: flex;
-    justify-content: flex-start;
-    margin: 0px 0px 0px 0px;
-    padding: 7px;
-    height: 49px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    height: 5.5%;
     color: slategray;
     border-bottom: 1px solid #202020;
 }
 
-.main-header button{
+.main-header button {
     margin-right: 10px;
 }
 
@@ -34,27 +38,24 @@
 
 .main-status {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
-    grid-auto-rows: 150px;
-    grid-gap: 20px;
-    margin: 20px 20px;
+    height: 17%;
+    grid-gap: 10px;
+    margin: 10px 10px;
+
 }
 
 .overviewcard {
     font-family: 'Montserrat', sans-serif;
     color: white;
-    display: flex;
-    justify-content: space-between;
     padding: 25px;
     border-radius: 4px;
     font-size: 30px;
     position: relative;
-    border-bottom: 15px solid rgb(255, 255, 255, 0.5);
-    transition-duration: 0.3s;
+    border-bottom: 10px solid rgb(255, 255, 255, 0.5);
 }
 
 .overviewcard:hover {
-    border-bottom: 25px solid rgb(255, 255, 255, 0.5);
+    filter: brightness(110%);
 }
 
 .overviewcard.A {
@@ -150,24 +151,18 @@
 ----------------------------------------------------- */
 
 .main-cards {
-    column-count: 1;
-    column-gap: 20px;
-    margin: 20px 20px;
+    display: grid;
+    height: 60%;
+    grid-gap: 10px;
+    margin: 10px 10px;
 }
 
 .card {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
     border: 1px solid #202020;
     border-radius: 4px;
-    color: white;
-    width: 100%;
-    height: 485px;
+    color: wheat;
     padding: 25px;
-    margin-bottom: 20px;
     font-family: 'Montserrat', sans-serif;
-    
     font-size: 20px;
 }
 
@@ -176,9 +171,9 @@
 .card.B {}
 
 .chart-container {
-    margin-bottom:
-    height: 100%;
+    margin-bottom: auto;
     width: 100%;
+    height: 100%;
 }
 
 /* ---------------------------------------------------
@@ -188,10 +183,10 @@
 .footer-cards {
     font-family: 'Montserrat', sans-serif;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
-    grid-auto-rows: 175px;
-    grid-gap: 20px;
-    margin: -20px 20px 20px 20px;
+
+    height: 15%;
+    grid-gap: 10px;
+    margin: 10px 10px;
     color: wheat
 }
 
@@ -216,9 +211,7 @@
         grid-template-columns: repeat(4, minmax(265px, 1fr));
     }
 
-    .main-cards {
-        column-count: 2;
-    }
+    .main-cards {}
 
     .footer-cards {
         grid-template-columns: repeat(4, minmax(265px, 1fr));
@@ -229,10 +222,16 @@
 @media only screen and (min-width: 930px) and (max-width: 1225px) {
     .main-status {
         grid-template-columns: repeat(2, minmax(265px, 1fr));
+        height: 40%;
+    }
+
+    .main-cards {
+        height: 90%;
     }
 
     .footer-cards {
         grid-template-columns: repeat(2, minmax(265px, 1fr));
+        height: 30%;
     }
 }
 
@@ -240,9 +239,26 @@
 @media only screen and (max-width: 930px) {
     .main-status {
         grid-template-columns: repeat(1, minmax(265px, 1fr));
+        height: 60%;
     }
+
+    .overviewcard {
+        border-bottom: 10px solid rgb(255, 255, 255, 0.5);
+        filter: brightness(100%);
+    }
+
+    .overviewcard:hover {
+        filter: brightness(110%);
+    }
+
+
+    .main-cards {
+        height: 80%;
+    }
+
 
     .footer-cards {
         grid-template-columns: repeat(1, minmax(265px, 1fr));
+        height: 60%
     }
 }

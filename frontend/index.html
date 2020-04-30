@@ -24,9 +24,10 @@
 
     <script src="js/sidebar.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/charts.js"></script>
 
     <link rel="stylesheet" href="css/body.css">
-    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/main.css">
 
@@ -35,20 +36,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<!-- https://coreui.io/demo/2.0/dark/#main.html -->
-<!-- https://adminlte.io/themes/v3/index.html -->
-<!-- https://bootstrapious.com/p/bootstrap-sidebar -->
-<!-- https://www.w3schools.com/bootstrap/tryit.asp?filename=trybs_temp_analytics&stacked=h -->
-<!-- https://designmodo.com/create-interactive-graph-css3-jquery/ -->
-
 <body onLoad="load_fresh()">
 
     <div class="grid-container">
 
+
         <header class="header">
             <div class="nav-header">
                 <div class="navbar sticky-top navbar-dark bg-dark">
-                    <a class="navbar-brand" href="">TS</a>
                     <button id="menu-toggle" class="navbar-toggler mr-auto">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -57,7 +52,7 @@
         </header>
 
 
-        <aside class="sidenav bg-dark">
+        <aside class="sidenav">
             <div class="side_container">
                 <nav id="sidebar" class="bg-dark">
                     <ul class="list-unstyled components">
@@ -72,74 +67,56 @@
 
 
         <main class="main">
-            <div class="main-header bg-dark">
-                <button type="button" class="btn btn-primary c" onclick="load_graph_data()">TEST A</button>
-                <button type="button" class="btn btn-primary c" onclick="">TEST B</button>
-            </div>
-
-            <div class="main-status">
-                <div class="overviewcard A">
-                    <div class="overviewcard__label w3-animate-opacity">Nodes Online</div>
-                    <div class="overviewcard__info w3-animate-opacity" id="n_online"></div>
-                    <div class="overviewcard__icon" align="center"><i class="material-icons clock" id="wifi_on">wifi_off</i></div>
+            <div class="main_wrapper">
+                <div class="main-header bg-dark">
+                    <button type="button" class="btn btn-primary c" onclick="load_graph_data()">TEST A</button>
+                    <button type="button" class="btn btn-primary c" onclick="">TEST B</button>
                 </div>
-                <div class="overviewcard B">
-                    <div class="overviewcard__label w3-animate-opacity">Temperature</div>
-                    <div class="overviewcard__info w3-animate-opacity" id="temp"></div>
-                    <div class="overviewcard__icon" align="center"><i class="fas fa-thermometer-half status_icon"></i></div>
-                </div>
-                <div class="overviewcard C">
-                    <div class="overviewcard__label w3-animate-opacity">Humidity</div>
-                    <div class="overviewcard__info w3-animate-opacity" id="hum"></div>
-                    <div class="overviewcard__icon" align="center"><i class="material-icons clock">waves</i></div>
-                </div>
-                <div class="overviewcard D">
-                    <div class="overviewcard__label w3-animate-opacity">UTC Time</div>
-                    <div class="overviewcard__info w3-animate-opacity" id="current_time"></div>
-                    <div class="overviewcard__icon" align="center"><i class="material-icons clock">access_time</i></div>
 
-                    <button type="button" class="time_btn" onclick="">
-                        <i class="material-icons md-1">settings</i>
-                        <i class="material-icons md-2">arrow_drop_down</i>
-                    </button>
-                </div>
-            </div>
+                <div class="main-status">
+                    <div class="overviewcard A">
+                        <div class="overviewcard__label w3-animate-opacity">Nodes Online</div>
+                        <div class="overviewcard__info w3-animate-opacity" id="n_online"></div>
+                        <div class="overviewcard__icon" align="center"><i class="material-icons clock" id="wifi_on">wifi_off</i></div>
+                    </div>
+                    <div class="overviewcard B">
+                        <div class="overviewcard__label w3-animate-opacity">Temperature</div>
+                        <div class="overviewcard__info w3-animate-opacity" id="temp"></div>
+                        <div class="overviewcard__icon" align="center"><i class="fas fa-thermometer-half status_icon"></i></div>
+                    </div>
+                    <div class="overviewcard C">
+                        <div class="overviewcard__label w3-animate-opacity">Humidity</div>
+                        <div class="overviewcard__info w3-animate-opacity" id="hum"></div>
+                        <div class="overviewcard__icon" align="center"><i class="material-icons clock">waves</i></div>
+                    </div>
+                    <div class="overviewcard D">
+                        <div class="overviewcard__label w3-animate-opacity">UTC Time</div>
+                        <div class="overviewcard__info w3-animate-opacity" id="current_time"></div>
+                        <div class="overviewcard__icon" align="center"><i class="material-icons clock">access_time</i></div>
 
-
-            <div class="main-cards">
-                <div class="card A bg-dark">
-                    <div>Temperature</div>
-                    <div class="chart-container">
-                        <canvas id="tempChart"></canvas>
+                        <button type="button" class="time_btn" onclick="">
+                            <i class="material-icons md-1">settings</i>
+                            <i class="material-icons md-2">arrow_drop_down</i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="card B bg-dark">
-                    <div>Humidity</div>
+                <div class="main-cards">
+                    <div class="card A bg-dark"> </div>
+                    <div class="card B bg-dark"> </div>
+                </div>
+
+                <div class="footer-cards">
+                    <div class="f-card bg-dark">T</div>
+                    <div class="f-card bg-dark">T</div>
+                    <div class="f-card bg-dark">T</div>
+                    <div class="f-card bg-dark">T</div>
                 </div>
             </div>
-
-
-            <div class="footer-cards">
-                <div class="f-card bg-dark">T</div>
-                <div class="f-card bg-dark">T</div>
-                <div class="f-card bg-dark">T</div>
-                <div class="f-card bg-dark">T</div>
-            </div>
-
-
         </main>
 
-        <!--        <footer class="footer"></footer>-->
 
     </div>
-
-    <!--
-    <div class="container-fluid">
-        <p id="data">Text</p>
-        <button type="button" onclick="load_table()">Test</button>
-    </div>
--->
 
 
 </body></html>

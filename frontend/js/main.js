@@ -22,7 +22,7 @@ function load_fresh() {
         var m = ("0" + time.getUTCMinutes()).slice(-2);
         var s = ("0" + time.getUTCSeconds()).slice(-2);
         var hms = h + ":" + m + ":" + s;
-        let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
+        let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/node_current_status.php";
         RequestData(url, function (json) {
             var data = json;
             var online = data["data"]["online"];
@@ -38,53 +38,8 @@ function load_fresh() {
                 document.getElementById('wifi_on').innerHTML = "wifi";
             }
         });
-    }, 1000);
+    }, 5000);
 }
-
-
-
-
-
-function load_graph_data() {
-
-    let url = "http://localhost/IoT_Environment_Monitor_System/backend/php/get_status.php";
-    
-    RequestData(url, function (data) {
-        var packet = data;
-        console.log(packet)
-        
-        var ctx = document.getElementById("tempChart");
-
-        var myChart = new Chart(ctx, {
-            type: 'line',
-
-            data: {
-
-                labels: [1, 2, 3, 4],
-
-                datasets: [{
-                        label: "Data",
-                        backgroundColor: "#e755ba",
-                        // Insert styling, colors etc here
-                        data: [
-                                {x: 1, y: 127},
-                                {x: 2, y: 140},
-                                {x: 3, y: 135},
-                                {x: 4, y: 122}
-                              ]
-                }]
-            }
-        });
-        
-        
-        
-    });
-}
-
-
-
-
-
 
 
 

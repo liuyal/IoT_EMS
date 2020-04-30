@@ -15,12 +15,10 @@ li a:focus {
     grid-area: sidenav;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    position: fixed;
-    overflow-y: auto;
-    padding-top: 50px;
+    height: 100vh;
+    padding-top: 51px;
+    background-color: rgb (52, 58, 64);
     z-index: 1;
-    
 }
 
 #sidebar {
@@ -31,11 +29,10 @@ li a:focus {
     transition: all 0.3s;
     background-color: rgb (52, 58, 64);
     border-right: 1px solid #202020;
-    
 }
 
 #sidebar.collapsed {
-    margin-left: -96px;
+    margin-left: -95px;
     height: 100%;
 }
 
@@ -81,7 +78,7 @@ a[data-toggle="collapse"] {
     }
 
     #sidebar.collapsed {
-        margin-left: -96px;
+        margin-left: -95px;
     }
 
     #content {

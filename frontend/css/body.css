@@ -10,18 +10,17 @@ html {
     padding: 0;
     height: 100%;
     position: relative;
-    background-color: rgb(37, 41, 46);
     box-sizing: border-box;
+    background-color: rgb(37, 41, 46);
 }
 
 .grid-container {
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 50px 1fr 50px;
-    grid-template-areas:
-        'header'
-        'main'
-        'footer';
     height: 100vh;
-    position: relative;
+    grid-template-columns: 140px 1fr;
+    grid-template-rows: 50px 1fr 25px;
+    grid-template-areas:
+        "sidenav header"
+        "sidenav main";
 }
+
