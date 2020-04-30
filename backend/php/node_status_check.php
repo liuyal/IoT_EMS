@@ -11,20 +11,26 @@
         return $ip;
     }
 
-    // TODO: Handle days
+    function secondsToTime($seconds) {
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@$seconds");
+        $time = $dtF->diff($dtT);
+        return $time->format('%a days, %H:%I:%S');
+    }    
+
     function timeConvert($delta) {
         if ($delta < 2) {
-            $return_time =  gmdate("H:i:s", $delta) . " second";
+            $return_time = " second";
         } else if ($delta < 60) {
-            $return_time =  gmdate("H:i:s", $delta) . " seconds";
+            $return_time = " seconds";
         } else if ($delta/60 == 1) {
-            $return_time =  gmdate("H:i:s", $delta) . " minute";
+            $return_time = " minute";
         } else if ($delta/60 > 1 && $delta/60 < 60) {
-            $return_time =  gmdate("H:i:s", $delta) . " minutes";
+            $return_time = " minutes";
         } else if ($delta/(60*60) == 1) {
-            $return_time =  gmdate("H:i:s", $delta) . " hour";
+            $return_time = " hour";
         } else {
-            $return_time =  gmdate("H:i:s", $delta) . " hours";
+            $return_time = " hours";
         }
         return $return_time;
     }
@@ -112,7 +118,7 @@
     } else if ($mode == "check") {
 
         $timeout = 5*60;
-        $list_nodes = mysqli_query($connect, "SELECT mac, time_stamp, status FROM nodes;");
+        $list_nodes = mysqli_query($connect, "SELECT mac, start_time, time_stamp, status FROM nodes;");
 
         if ($list_nodes && $list_nodes->num_rows < 1) {
             $response["success"] = 0;
@@ -123,12 +129,13 @@
             while ($row = mysqli_fetch_array($list_nodes)) {
                 
                 $mac = $row["mac"];
+                $start_time = $row["start_time"];
                 $node_time = $row["time_stamp"];
                 $delta = $current_time - $node_time;
 
                 if ($delta > $timeout) {
-
-                    $time_info = timeConvert($delta);
+                    
+                    $time_info = secondsToTime($delta) . timeConvert($delta);
                     $update_status = mysqli_query($connect,"UPDATE nodes SET start_time=0, status=false WHERE mac='$mac';");
                     
                     if ($update_status) {
@@ -139,16 +146,19 @@
                         $response["success"] = 0;
                         $response["message"][$row["mac"]][0] = "Failed to Update node: $mac status.";
                     }
-                }
-                else {
+                } else {
                     
-                    $time_info = timeConvert($delta);
+                    $start_delta = $current_time - $start_time;
+                    $time_info = secondsToTime($delta) . timeConvert($delta);
+                    $up_time = secondsToTime($start_delta) . timeConvert($start_delta);
                     $update_status = mysqli_query($connect, "UPDATE nodes SET status=true WHERE mac='$mac';");
                     
                     if ($update_status) {
                         $response["success"] = 1;
                         $response["message"][$row["mac"]][0] = "Node: $mac last seen $time_info ago.";
                         $response["message"][$row["mac"]][1] = "Updating status to online.";
+                        $response["message"][$row["mac"]][2] = "Online for $time_info.";
+                        
                     } else {
                         $response["success"] = 0;
                         $response["message"][$row["mac"]][0] = "Failed to Update node: $mac status.";
