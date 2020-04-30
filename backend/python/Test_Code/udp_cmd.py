@@ -85,7 +85,7 @@ def update_node_db_status(update_list, connection):
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
 
-# TOD0: handle all cmd msgs
+
 def insert_data(data, connection):
     try:
         cslog("Inserting data into database")
@@ -105,7 +105,6 @@ def insert_data(data, connection):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-f", "--fetch", action='store_true', help='Pull data from Node(s) and send to host')
     parser.add_argument("-P", "--ping", action='store_true', help='Ping Node(s)')
@@ -146,8 +145,6 @@ if __name__ == "__main__":
     except:
         parser.print_usage()
         sys.exit("Invalid Host IP to be set: " + str(input_arg.HOST_IP))
-
-
 
     cmd = []
     cslog("Started UDP Command Handler")

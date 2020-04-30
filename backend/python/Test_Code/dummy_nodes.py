@@ -105,7 +105,6 @@ def int_to_mac(macint):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-http', action='store_true', dest="http", default=False, help='HTTP mode')
     parser.add_argument('-u', "--UDP", action='store_true', dest="udp", default=False, help='UDP mode')
@@ -113,10 +112,8 @@ if __name__ == "__main__":
     parser.add_argument('-n', "--NODES", action='store', dest="nodes", default=5, help='Verbose mode')
     input_arg = parser.parse_args()
 
-    try:
-        sys.argv[1]
-    except:
-        parser.print_help()
+    try: sys.argv[1]
+    except: parser.print_help()
 
     HOST_IP = "192.168.1.80"
     HOST_PORT = 9996

@@ -26,8 +26,7 @@ def mac_to_int(mac):
 
 
 def int_to_mac(macint):
-    if type(macint) != int:
-        raise ValueError('invalid integer')
+    if type(macint) != int: raise ValueError('invalid integer')
     return ':'.join(['{}{}'.format(a, b) for a, b in zip(*[iter('{:012x}'.format(macint))] * 2)])
 
 
@@ -379,7 +378,6 @@ def SQL_disconnection_handler(connection):
 
 
 if __name__ == "__main__":
-
     ip = "localhost"
     nodes = 2
     n_threads = 200

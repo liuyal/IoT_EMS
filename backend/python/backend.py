@@ -6,10 +6,8 @@ from mysql.connector import errorcode
 
 
 def cslog(msg, flag="info"):
-    if input_arg.verbose and flag == "info":
-        print(msg)
-    elif input_arg.verbose and flag == "error":
-        print("\033[91m" + msg + "\033[0m")
+    if input_arg.verbose and flag == "info": print(msg)
+    elif input_arg.verbose and flag == "error": print("\033[91m" + msg + "\033[0m")
     if input_arg.log:
         if flag == "info": logging.info(msg)
         if flag == "error": logging.error(msg)
@@ -70,7 +68,6 @@ def sql_node_status_update(update_list, on_list, connection):
     try:
         cursor = connection.cursor()
         cursor.execute("USE " + str(connection.database) + ";")
-
         for item in on_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)
@@ -84,7 +81,6 @@ def sql_node_status_update(update_list, on_list, connection):
                 update_cmd = "UPDATE nodes SET start_time=" + str(item["time"]) + ",time_stamp=" + str(item["time"]) + ",ip='" + item["ip"] + "',port=" + str(item["port"]) + ",status=true WHERE mac='" + item["mac"] + "';"
                 cursor.execute(update_cmd)
                 cslog("Node " + item["mac"] + " Online.")
-
         for item in update_list:
             search_cmd = "SELECT mac FROM nodes WHERE mac='" + item["mac"] + "';"
             cursor.execute(search_cmd)
@@ -95,10 +91,12 @@ def sql_node_status_update(update_list, on_list, connection):
                 cursor.execute(add_node + values)
                 cslog("Added node " + item["mac"] + " to status table.")
             else:
+                cursor.execute("SELECT start_time FROM nodes where mac='" + item["mac"] + "';")
+                result = cursor.fetchall()
+                if result[0][0] == 0: cursor.execute("UPDATE nodes SET start_time=" + str(item["time"]) + " WHERE mac='" + item["mac"] + "';")
                 update_cmd = "UPDATE nodes SET time_stamp=" + str(item["time"]) + ", ip='" + item["ip"] + "', port=" + str(item["port"]) + ", status=true WHERE mac='" + item["mac"] + "';"
                 cursor.execute(update_cmd)
                 cslog("Updated node " + item["mac"] + " status.")
-
         connection.commit()
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
@@ -111,13 +109,13 @@ def sql_insert(insert_list, connection):
         for item in insert_list:
             packet = item["data"].decode("utf-8")[item["data"].decode("utf-8").index('[') + 1:item["data"].decode("utf-8").index(']')].split("|")
             if packet[1] == "data_sent":
-                mac = item["mac"]
-                epoch = item["time"]
                 temp = packet[3]
                 hum = packet[4]
-                sql_cmd = "INSERT INTO DATA(mac, time, temp, hum) VALUES('" + str(mac) + "', " + str(epoch) + ", " + str(temp) + ", " + str(hum) + ");"
-                cursor.execute(sql_cmd)
-                cslog("Node: " + mac + " inserted data")
+                cursor.execute("SELECT start_time FROM nodes where mac='" + item["mac"] + "';")
+                result = cursor.fetchall()
+                if result[0][0] == 0: cursor.execute("UPDATE nodes SET start_time=" + str(item["time"]) + " WHERE mac='" + item["mac"] + "';")
+                cursor.execute("INSERT INTO DATA(mac, time, temp, hum) VALUES('" + item["mac"] + "', " + str(item["time"]) + ", " + str(temp) + ", " + str(hum) + ");")
+                cslog("Node: " + item["mac"] + " inserted data")
         connection.commit()
     except Exception as error:
         cslog("Failed {}".format(error), flag="error")
@@ -133,46 +131,37 @@ def node_cmd_handler():
     if input_arg.set_host != None: cmd.append(("[set_host|" + str(input_arg.set_host) + "]\n").encode('utf8'))
     if input_arg.reboot: cmd.append(b"[reboot]\n")
 
-    if input_arg.NODE_IP.split('.')[-1] == "255":
-        thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
-    else:
-        thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
-
+    if input_arg.NODE_IP.split('.')[-1] == "255": thread_send = threading.Thread(target=udp_broadcast, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
+    else:  thread_send = threading.Thread(target=udp_send, args=(cmd, input_arg.NODE_IP, input_arg.NODE_PORT))
     if input_arg.Listen_PORT > 0: thread_listen = threading.Thread(target=udp_listener, args=(msg_queue, "0.0.0.0", input_arg.Listen_PORT, input_arg.udp_timeout))
 
     thread_send.start()
     if input_arg.Listen_PORT > 0: thread_listen.start()
-
     thread_send.join()
     if input_arg.Listen_PORT > 0: thread_listen.join()
 
     if input_arg.update and input_arg.Listen_PORT > 0:
-        db_connection = SQL_connection_handler()
-        msg_list = msg_queue.get()
-        mac_list = (list(set(msg_queue.get())))
-
         insert_list = []
         on_list = []
         update_list = []
+        db_connection = SQL_connection_handler()
+        msg_list = msg_queue.get()
+        mac_list = (list(set(msg_queue.get())))
 
         for node in mac_list:
             for msg in reversed(msg_list):
                 if node == msg["mac"] and "data_sent" in str(msg["data"]):
                     insert_list.append(msg)
-                    msg_list.remove(msg)
-
         for node in mac_list:
             for msg in reversed(msg_list):
                 if node == msg["mac"] and "reboot" not in str(msg["data"]):
                     update_list.append(msg)
                     break
-
         for node in mac_list:
             for msg in reversed(msg_list):
                 if node == msg["mac"] and "|on|" in str(msg["data"]):
                     on_list.append(msg)
                     break
-
         sql_node_status_update(update_list, on_list, db_connection)
         sql_insert(insert_list, db_connection)
         SQL_disconnection_handler(db_connection)
@@ -255,7 +244,6 @@ def sql_cmd_maker(connection):
 
     cursor.execute("SELECT mac, time, temp, hum FROM  data ORDER BY time ASC;")
     time_list = cursor.fetchall()
-
     if len(time_list) < 1:
         cslog("Empty data Table, EXIT.", flag="error")
         sys.exit()
@@ -281,10 +269,8 @@ def sql_cmd_maker(connection):
             remove_list.append(remove_cmd)
             cmd_counter += 1
     connection.close()
-    if cmd_counter == 0:
-        cslog("No data to be backed up.")
-    else:
-        cslog("Backing up " + str(cmd_counter) + " data points.")
+    if cmd_counter == 0: cslog("No data to be backed up.")
+    else: cslog("Backing up " + str(cmd_counter) + " data points.")
     return insert_list, remove_list
 
 
@@ -329,18 +315,12 @@ def backup_daily_data():
 
 
 def time_formatter(delta_seconds):
-    if int(delta_seconds) < 2:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " second"
-    elif int(delta_seconds) < 60:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
-    elif int(delta_seconds / 60) == 1:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
-    elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
-    elif int(delta_seconds / (60 * 60)) == 1:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
-    else:
-        time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
+    if int(delta_seconds) < 2: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " second"
+    elif int(delta_seconds) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " seconds"
+    elif int(delta_seconds / 60) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minute"
+    elif int(delta_seconds / 60) > 1 and int(delta_seconds / 60) < 60: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " minutes"
+    elif int(delta_seconds / (60 * 60)) == 1: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hour"
+    else: time_info = str(datetime.timedelta(seconds=delta_seconds)) + " hours"
     return time_info
 
 
@@ -350,8 +330,7 @@ def check_node_status():
     cursor.execute("USE " + str(db_connection.database) + ";")
     cursor.execute("SELECT mac, start_time, time_stamp, status FROM nodes;")
     result = cursor.fetchall()
-    if len(result) < 1:
-        cslog("No Nodes found")
+    if len(result) < 1: cslog("No Nodes found")
     else:
         cslog("Checking node status.")
         for item in result:
@@ -439,7 +418,6 @@ def SQL_disconnection_handler(connection):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description='', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("-f", "--fetch", action='store_true', help='Pull data from Node(s) and send to host')
     parser.add_argument("-p", "--ping", action='store_true', help='Ping Node(s)')
