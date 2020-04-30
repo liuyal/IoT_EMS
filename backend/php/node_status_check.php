@@ -157,7 +157,7 @@
                         $response["success"] = 1;
                         $response["message"][$row["mac"]][0] = "Node: $mac last seen $time_info ago.";
                         $response["message"][$row["mac"]][1] = "Updating status to online.";
-                        $response["message"][$row["mac"]][2] = "Online for $time_info.";
+                        $response["message"][$row["mac"]][2] = "Online for $up_time.";
                         
                     } else {
                         $response["success"] = 0;
