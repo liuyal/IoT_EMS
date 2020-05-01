@@ -4,6 +4,8 @@ var tempchart;
 
 var humchart;
 
+var last_time_plot = {};
+
 var chart_config1 = {
     type: 'line',
     data: {
@@ -19,6 +21,7 @@ var chart_config1 = {
                     beginAtZero: true
                 },
                 gridLines: {
+                    display: false,
                     color: "rgba(0, 0, 0, 0)",
                 }
                 }],
@@ -28,6 +31,7 @@ var chart_config1 = {
                     beginAtZero: true
                 },
                 gridLines: {
+                    
                     color: "rgba(0, 0, 0, 0)",
                 }
                 }]
@@ -56,6 +60,7 @@ var chart_config2 = {
                     beginAtZero: true
                 },
                 gridLines: {
+                     display: false,
                     color: "rgba(0, 0, 0, 0)",
                 }
                 }],
@@ -92,10 +97,11 @@ function load_graph_data() {
             data[packet["data"][i]["mac"]]["hum"] = [];
             data[packet["data"][i]["mac"]]["time"] = [];
 
-            for (j = 0; j < packet["data"][i]["history"].length; j++) {
-                data[packet["data"][i]["mac"]]["time"][j] = packet["data"][i]["history"][j][1].toHHMMSS();
-                data[packet["data"][i]["mac"]]["temp"][j] = packet["data"][i]["history"][j][2];
-                data[packet["data"][i]["mac"]]["hum"][j] = packet["data"][i]["history"][j][3];
+            for (j = packet["data"][i]["history"].length - 1; j >= 0; j--) {
+                var data_index = packet["data"][i]["history"].length - 1 - j;
+                data[packet["data"][i]["mac"]]["time"][data_index] = packet["data"][i]["history"][j][1].toHHMMSS();
+                data[packet["data"][i]["mac"]]["temp"][data_index] = packet["data"][i]["history"][j][2];
+                data[packet["data"][i]["mac"]]["hum"][data_index] = packet["data"][i]["history"][j][3];
                 index[j] = j;
             }
         }
