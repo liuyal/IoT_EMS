@@ -46,6 +46,7 @@
         if ($history && count($data) > 0 && count($data) == $limit) {
             $response["message"][$counter + 1] = "Fresh data found for $mac";
             $response["data"][$counter]["mac"] = $mac;
+            $response["data"][$counter]["last_time"] = $data[0][1];
             $response["data"][$counter]["last_temp"] = $data[0][2];
             $response["data"][$counter]["last_hum"] = $data[0][3];
             $response["data"][$counter]["history"] = $data;
@@ -62,12 +63,14 @@
                 $data2 = mysqli_fetch_all($history2);
                 $response["message"][$counter + 1] = "Fresh data found for $mac";
                 $response["data"][$counter]["mac"] = $mac;
+                $response["data"][$counter]["last_time"] = $data[0][1];
                 $response["data"][$counter]["last_temp"] = $data[0][2];
                 $response["data"][$counter]["last_hum"] = $data[0][3];
                 $response["data"][$counter]["history"] = array_merge($data, $data2);
             } else {
                 $response["message"][$counter + 1] = "Fresh data found for $mac, (<1H)";
                 $response["data"][$counter]["mac"] = $mac;
+                $response["data"][$counter]["last_time"] = $data[0][1];
                 $response["data"][$counter]["last_temp"] = $data[0][2];
                 $response["data"][$counter]["last_hum"] = $data[0][3];
                 $response["data"][$counter]["history"] = $data;
@@ -76,6 +79,7 @@
         } else {
             $response["message"][$counter + 1] = "No data found for $mac";
             $response["data"][$counter]["mac"] = $mac;
+            $response["data"][$counter]["last_time"] = 0;
             $response["data"][$counter]["last_temp"] = 0;
             $response["data"][$counter]["last_hum"] = 0;
             $response["data"][$counter]["history"] = [0];   

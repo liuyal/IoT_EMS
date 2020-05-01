@@ -42,9 +42,6 @@ function load_fresh() {
             document.getElementById('current_time').innerHTML = hms;
             if (online == 0) document.getElementById('wifi_on').innerHTML = "wifi_off";
             else document.getElementById('wifi_on').innerHTML = "wifi";
-
-
-
         });
     }, 1000);
     
