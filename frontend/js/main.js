@@ -1,3 +1,12 @@
+
+
+$(document).ready(function () {
+    tempchart = new Chart(document.getElementById('tempChart'), chart_config1);
+    humchart = new Chart(document.getElementById('humChart'), chart_config2);
+    load_graph_data();
+})
+
+
 function RequestData(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -38,12 +47,6 @@ function load_fresh() {
                 document.getElementById('wifi_on').innerHTML = "wifi";
             }
         });
-    }, 5000);
+    }, 1000);
 }
-
-
-
-
-
-
 

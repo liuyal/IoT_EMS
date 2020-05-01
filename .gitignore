@@ -6,6 +6,6 @@ target/
 *.link
 *.sql
 *.log
-*.lnk
+*.Ink
 *.URL
 git_commit.py
