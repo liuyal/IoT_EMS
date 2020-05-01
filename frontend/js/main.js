@@ -43,47 +43,8 @@ function load_fresh() {
             if (online == 0) document.getElementById('wifi_on').innerHTML = "wifi_off";
             else document.getElementById('wifi_on').innerHTML = "wifi";
 
-            /*TODO: push fresh value and pop old value*/
-
-            var data = {};
-            var index = []
-            for (i = 0; i < Object.keys(packet["data"]).length; i++) {
-                data[packet["data"][i]["mac"]] = [];
-                data[packet["data"][i]["mac"]]["temp"] = [];
-                data[packet["data"][i]["mac"]]["hum"] = [];
-                data[packet["data"][i]["mac"]]["time"] = [];
-
-                for (j = packet["data"][i]["history"].length - 1; j >= 0; j--) {
-                    var data_index = packet["data"][i]["history"].length - 1 - j;
-                    data[packet["data"][i]["mac"]]["time"][data_index] = packet["data"][i]["history"][j][1].toHHMMSS();
-                    data[packet["data"][i]["mac"]]["temp"][data_index] = packet["data"][i]["history"][j][2];
-                    data[packet["data"][i]["mac"]]["hum"][data_index] = packet["data"][i]["history"][j][3];
-                    index[j] = j;
-                }
-
-                var last_time = packet["data"][i]["history"][0][1];
-                var last_temp = packet["data"][i]["history"][0][2];
-                var last_hum = packet["data"][i]["history"][0][3];
 
 
-                if (packet["data"][i]["history"].length < 30) {
-
-                    
-                    if (tempchart.getDatasetMeta(0).data[tempchart.getDatasetMeta(0).data.length - 1]._xScale.max != last_time.toHHMMSS()) {
-
-                        tempchart.data.labels.push((last_time).toHHMMSS());
-                        tempchart.data.datasets.forEach((database) => {
-                            database.data.push(last_temp);
-                        });
-                        tempchart.update();
-                    }
-
-                } else {
-
-
-
-                }
-            }
         });
     }, 1000);
     
