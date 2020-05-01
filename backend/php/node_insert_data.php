@@ -43,7 +43,7 @@
         exit;
     }
 
-    $insert_result = mysqli_query($connect, "INSERT INTO data(mac,time,temp,hum) VALUES('$mac', $time, $temp , $hum);");
+    $insert_result = mysqli_query($connect, "INSERT INTO data(mac, time, temp, hum) VALUES('$mac', $time, $temp , $hum);");
     
     if ($insert_result) { 
         $response["message"][1] = "Data successfully inserted"; 
@@ -56,7 +56,7 @@
     $ip = getUserIpAddr();
 
     if ($find_mac && $find_mac->num_rows == 0) {
-        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, time_stamp, status) VALUES('$mac', '$ip', 0, $time, true)");
+        $update_result = mysqli_query($connect, "INSERT INTO nodes(mac, ip, port, start_time, time_stamp, status) VALUES('$mac', '$ip', 0, $time, $time, true)");
     } else if ($find_mac) {
         $update_result = mysqli_query($connect, "UPDATE nodes SET time_stamp=$time, status=true WHERE mac='$mac';");
     }
