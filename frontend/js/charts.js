@@ -135,23 +135,13 @@ function load_graph_data() {
 
 String.prototype.toHHMMSS = function () {
     var date = new Date(parseInt(this, 10) * 1000);
-
     var hours = date.getHours();
     var minutes = date.getMinutes();
     var seconds = date.getSeconds();
 
-
-    if (hours < 10) {
-        hours = "0".concat(hours);
-    }
-
-    if (minutes < 10) {
-        minutes = "0".concat(minutes);
-    }
-
-    if (seconds < 10) {
-        seconds = "0".concat(seconds);
-    }
+    if (hours < 10) hours = "0".concat(hours);
+    if (minutes < 10) minutes = "0".concat(minutes);
+    if (seconds < 10) seconds = "0".concat(seconds);
 
     return hours + ':' + minutes;
 }

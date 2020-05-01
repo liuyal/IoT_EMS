@@ -24,6 +24,8 @@ function RequestData(url, callback) {
 }
 
 
+/*TODO: push fresh value and pop old value*/
+
 function load_fresh() {
     window.setInterval(function () {
         var time = new Date();
