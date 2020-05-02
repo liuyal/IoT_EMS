@@ -13,7 +13,7 @@
   - [Scapy](https://pypi.org/project/scapy/)
   - [Requests](https://pypi.org/project/requests/)
   - [mysql-connector](https://pypi.org/project/mysql-connector-python/)
--[XAMPP](https://www.apachefriends.org/index.html)
+- [XAMPP](https://www.apachefriends.org/index.html)
   - PHP
   - Apache
   - MYSQL
